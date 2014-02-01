@@ -1,3 +1,7 @@
+/resources
+/build
+/dist
+
 *.class
 
 # Package Files #
