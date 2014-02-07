@@ -6,11 +6,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
-import navigation.server.BoundingBox;
+import navigation.shared.BoundingBox;
+import navigation.server.FastRTParser;
 import navigation.server.NSFParser;
-import navigation.shared.Area;
+import navigation.util.BuildingUtils;
 import navigation.shared.Building;
-import navigation.shared.Constants;
+import navigation.util.Constants;
 import navigation.shared.LatLong;
 import navigation.shared.Segment;
 import org.geotools.data.FeatureSource;
@@ -40,26 +41,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class Main {
 
-//    public static void main(String args[]) throws Exception {
-//        Segment seg = new Segment();
-//        LatLong start = new LatLong(34.06217925,-118.448064625);
-//        LatLong end = new LatLong(34.062142875,-118.4480501875);
-//        UtmLatLong utmStart = Util.convertToUTM(start);
-//        UtmLatLong utmEnd = Util.convertToUTM(end);
-//        
-//        System.out.println("Start: " + start);
-//        System.out.println("End: " + end);
-//        System.out.println("UTM start: " + utmStart);
-//        System.out.println("UTM end: " + utmEnd);
-//        System.out.println("latlong distance: " + Util.getDistance(start, end));
-//        System.out.println("UTM distance: " + Util.getDistanceUTM(utmStart, utmEnd));
-//        System.out.println();
-//        
-//        seg.setStart_point(start);
-//        seg.setEnd_point(end);
-//        System.out.println("isInShadow(): " + seg.isInShadow());
-//        System.out.println("distance: " + Util.getDistance(new LatLong(34.06217925,-118.448064625), new LatLong(34.062142875,-118.4480501875)));
-//    }
 	public static void main(String args[]) throws Exception
 	{
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
@@ -89,7 +70,7 @@ public class Main {
             }
             
             ArrayList<Building> list = new ArrayList<Building>();
-            Area area = new Area();
+            BuildingUtils area = new BuildingUtils();
             File file = new File(Constants.PATH + Constants.SHP);
             FileDataStore store = FileDataStoreFinder.getDataStore(file);
             FeatureSource source = store.getFeatureSource();

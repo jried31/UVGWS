@@ -3,16 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package navigation.shared;
+package navigation.util;
 
-import java.io.File;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FileDataStore;
-import org.geotools.data.FileDataStoreFinder;
+import navigation.shared.LatLong;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
-import org.opengis.feature.type.FeatureType;
-import org.opengis.geometry.BoundingBox;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -76,16 +71,6 @@ public class Util {
         return rKm*c;
     }
     
-
-    public static double getDistanceUTM(UtmLatLong src, UtmLatLong dst) {
-        double x1 = src.getLatitude();
-        double y1 = src.getLongitude();
-        double x2 = dst.getLatitude();
-        double y2 = dst.getLongitude();
-
-        double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
-        return d;
-    }
     
     /**
      * 

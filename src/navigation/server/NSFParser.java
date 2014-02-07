@@ -9,7 +9,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import navigation.shared.Constants;
+import navigation.util.Constants;
 
 import java.io.FileReader;
 import java.io.IOException;

@@ -31,12 +31,11 @@ public class Building {
         LatLong uc = this.getUpperCorner();
 
         Coordinate[] coords  = new Coordinate[] {
-            new Coordinate(lc.getLongitude(),lc.getLatitude()), 
+            new Coordinate(lc.getLongitude(), lc.getLatitude()), 
             new Coordinate(lc.getLongitude(), uc.getLatitude()),
-            new Coordinate(uc.getLongitude(),uc.getLatitude()), 
+            new Coordinate(uc.getLongitude(), uc.getLatitude()), 
             new Coordinate(uc.getLongitude(), lc.getLatitude()),
-            new Coordinate(lc.getLongitude(),lc.getLatitude()) };
-            
+            new Coordinate(lc.getLongitude(), lc.getLatitude()) };
         return coords;
     }
     public LatLong getLowerCorner(){
