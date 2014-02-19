@@ -37,12 +37,10 @@ import org.geotools.geometry.jts.JTSFactoryFinder;
  * working directory.
  */
 public class BuildingUtils {
-	private final double DEGREE_VARIANCE_PER_FEET = 0.0000027;
-	private double endpointBuffer = 100;
-        
+    private final double DEGREE_VARIANCE_PER_FEET = 0.0000027;
+    private double endpointBuffer = 100;
 
     public BuildingUtils( ){
-        
     }
     // Creates a custom bounding box and returns all buildings within it.
     // Input bb coordinates must be converted into UTM format prior to proccessing.
