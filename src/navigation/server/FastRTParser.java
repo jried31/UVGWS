@@ -50,9 +50,11 @@ public class FastRTParser {
         // TODO: change to date of activity once we decide on data format
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
         //note: zero-based, Jan == 0
-        int month_number = cal.get(Calendar.MONTH)+1;
+        int month_number = cal.get(Calendar.MONTH); //actual month number minus 1
         int day_number = cal.get(Calendar.DAY_OF_MONTH);
-        String month = String.valueOf(month_number);
+        int[] month_days = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+        int month_day = month_days[month_number];
+        String month = String.valueOf(month_day);
         String day = String.valueOf(day_number);
         
         // gets latitude and longitude of requested location
