@@ -11,7 +11,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
+import navigation.shared.LatLong;
+import navigation.shared.Person;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -39,19 +43,51 @@ public class FastRTParser {
     // Parses http://zardoz.nilu.no/cgi-bin/olaeng/VitD_quartMEDandMED.cgi and
     // returns the minimum amount of time needed to be spent in the sun for
     // effective Vitamin D consumption.
-    public String parse() throws URISyntaxException, ClientProtocolException, IOException {
+    public String parse(LatLong location, Person person) throws URISyntaxException, ClientProtocolException, IOException {
         String website = "http://zardoz.nilu.no/cgi-bin/olaeng/VitD_quartMEDandMED.cgi";
 
+        // uses current date for month and day inputs
+        // TODO: change to date of activity once we decide on data format
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
+        //note: zero-based, Jan == 0
+        int month_number = cal.get(Calendar.MONTH)+1;
+        int day_number = cal.get(Calendar.DAY_OF_MONTH);
+        String month = String.valueOf(month_number);
+        String day = String.valueOf(day_number);
+        
+        // gets latitude and longitude of requested location
+        double latitude_double = location.getLatitude();
+        double longitude_double = location.getLongitude();
+        String latitude = String.valueOf(latitude_double);
+        String longitude = String.valueOf(longitude_double);
+        
+        String skinType = person.getSkinType();
+        int SPF = person.getSPF();
+        
         // POST key, value pairs
         List<NameValuePair> qparams = new ArrayList<NameValuePair>();
-        qparams.add(new BasicNameValuePair("month", "90"));
-        qparams.add(new BasicNameValuePair("mday", "14"));
-        qparams.add(new BasicNameValuePair("latitude", "50.5"));
-        qparams.add(new BasicNameValuePair("longitude", "4.2"));
+        /* previous statements with default values
+        //qparams.add(new BasicNameValuePair("month", "90"));
+        //qparams.add(new BasicNameValuePair("mday", "14"));
+        //qparams.add(new BasicNameValuePair("latitude", "50.5"));
+        //qparams.add(new BasicNameValuePair("longitude", "4.2"));
+        //qparams.add(new BasicNameValuePair("skin_index", "5"));
+        //qparams.add(new BasicNameValuePair("exposure_timing", "0"));
+        //qparams.add(new BasicNameValuePair("start_time", "10.5"));
+        //qparams.add(new BasicNameValuePair("body_exposure", "25"));
+        */
+        qparams.add(new BasicNameValuePair("month", month));
+        qparams.add(new BasicNameValuePair("mday", day));
+        qparams.add(new BasicNameValuePair("latitude", latitude));
+        qparams.add(new BasicNameValuePair("longitude", longitude));
         qparams.add(new BasicNameValuePair("sza_angle", "60"));
+        // TODO: what are skin type options? how does it correspond to 1-6 scale?
         qparams.add(new BasicNameValuePair("skin_index", "5"));
-        qparams.add(new BasicNameValuePair("exposure_timing", "0"));
+        //assumes "1" selects 'Start time', instead of 'Around midday'
+        qparams.add(new BasicNameValuePair("exposure_timing", "1"));
+        // TODO: what is format/data type of time? (add to parameters)
         qparams.add(new BasicNameValuePair("start_time", "10.5"));
+        // TODO: change body_exposure when SPF is different?
         qparams.add(new BasicNameValuePair("body_exposure", "25"));
         qparams.add(new BasicNameValuePair("dietary_equivalent", "1000"));
         qparams.add(new BasicNameValuePair("sky_condition", "0"));
