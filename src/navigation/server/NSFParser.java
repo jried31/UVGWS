@@ -83,7 +83,7 @@ public class NSFParser {
 
         return vitaminDSet;
     }
-
+/*
     // Proof of concept. Do not use in application.
     // Iterates the excel file and calculates the UV index using the summation
     // of the different wavelength strength and cie value products.
@@ -142,5 +142,13 @@ public class NSFParser {
         System.out.println(uvIndex.size());
 
         return uvIndex;
+    }
+     * 
+     * 
+     */
+    
+    //will return UVI based on NSF readings at time.
+    public double getUVIndex() {
+        return 0;
     }
 }

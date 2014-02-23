@@ -84,8 +84,13 @@ public class Util {
     
     // Converts irradiance (W/m2) to Joules based on duration of exposure and
     // average exposed skin area
-    public static double irradianceToJoules(double irradiance, double time) {
-        return irradiance * time * Constants.AVERAGE_HUMAN_SURFACE_AREA * AVERAGE_EXPOSED_SKIN_PERCENT;
+    public static double computeExposure(double UVI, double time) {
+        return UVI * 0.001 * 25 * time * Constants.AVERAGE_HUMAN_SURFACE_AREA * Constants.AVERAGE_EXPOSED_SKIN_PERCENT;
+    }
+    
+    
+    public static double computeExposure(double UVI, double time, double percent_exposed) {
+        return UVI * 0.001 * 25 * time * Constants.AVERAGE_HUMAN_SURFACE_AREA * percent_exposed;
     }
     
     public static double getError(double actual, double result) {

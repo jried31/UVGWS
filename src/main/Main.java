@@ -126,8 +126,8 @@ public class Main {
             System.out.println(hoursForVitaminD);
             
             //Computes the UVI from the excel file
-            Map<String, Double> uvi = parser.getUVIndex();
-            System.out.println(uvi);
+            //Map<String, Double> uvi = parser.getUVIndex();
+            //System.out.println(uvi);
             
            
 /*		LatLong source = new LatLong(Double.parseDouble("34.06649"), Double.parseDouble("-118.452984"));

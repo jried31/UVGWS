@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import navigation.util.SunUtil;
-
+import java.lang.IllegalArgumentException;
 /**
  * @author Jerrid
  *
@@ -24,7 +24,11 @@ public class Segment {
 
     private LatLong start_location;
     private LatLong end_location;
+    private Calendar start_time;
+    private Calendar end_time;
     private double averageUvi = 0;
+    private double measuredUVI = 0;
+    private double effectiveUVI = 0;
     private int no_of_readings = 0;
     private int numTimesInShadow=0, numTimesInSun=0;
     private double distanceInShadow, distanceInSun; //in km
@@ -41,6 +45,23 @@ public class Segment {
             return;
         }
         getReadings();
+    }
+    
+    //to get rid of errors, remove if unnecessary in final version
+    public Segment()
+    {
+        return;
+    }
+    
+    public Segment(LatLong start_coords,LatLong end_coords,Calendar start_t,Calendar end_t, double UVI) throws Exception
+    {
+        if(Util.getDistance(start_coords, end_coords) > this.MAX_SEGMENT_SIZE)
+            throw new IllegalArgumentException();
+        this.start_location = start_coords;
+        this.end_location = end_coords;
+        this.start_time = start_t;
+        this.end_time = end_t;
+        this.measuredUVI = UVI;
     }
 
     public double getDistanceInShadow() {
@@ -217,4 +238,44 @@ public class Segment {
         return numSegmentSlices;
     }
 
+    public void setStartTime(Calendar time) {
+        this.start_time = time;
+    }
+
+    public Calendar getStartTime() {
+        return start_time;
+    }
+
+    public void setEndTime(Calendar time) {
+        this.end_time = time;
+    }
+
+    public Calendar getEndTime() {
+        return end_time;
+    }
+    
+    //returns duration along segment
+    public double getSegmentDuration() {
+        return (end_time.getTimeInMillis() - start_time.getTimeInMillis()) * 1000;
+    }
+    
+    public void calculateEffectiveUVI() 
+    {
+        double eUVI = measuredUVI;
+        try {
+            if (this.isInShadow()) {
+                eUVI = eUVI * Constants.SHADOW_DAMPING_FACTOR;
+            }
+        }
+        catch (Exception e) {
+            this.effectiveUVI = 0;
+            e.printStackTrace();   
+        }
+        this.effectiveUVI = eUVI;
+    }
+    
+    public double getEffectiveUVDose() {
+        Util utils = new Util();
+        return utils.computeExposure(this.effectiveUVI, this.getSegmentDuration());
+    }
 }

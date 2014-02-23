@@ -26,8 +26,11 @@ public class Constants {
     public final static double AVERAGE_WALKING_SPEED = 1.3;//meters per second
     
     //data taken from European Organisation for Research and Treatment of Cancer
-    public final static double AVERAGE_HUMAN_SURFACE_AREA = 1.73 // square meters
+    public final static double AVERAGE_HUMAN_SURFACE_AREA = 1.73; // square meters
     
     //value is only an estimate, no study found at this time
-    public final static double AVERAGE_EXPOSED_SKIN_PERCENT = 0.2
+    public final static double AVERAGE_EXPOSED_SKIN_PERCENT = 0.2;
+    
+//Amount of UV exposure blocked by shadows, find more concrete answers
+    public final static double SHADOW_DAMPING_FACTOR = 0.5;
 }
