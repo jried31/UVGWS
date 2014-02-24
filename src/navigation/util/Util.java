@@ -93,6 +93,14 @@ public class Util {
         return UVI * 0.001 * 25 * time * Constants.AVERAGE_HUMAN_SURFACE_AREA * percent_exposed;
     }
     
+    public static double irradianceToJoules(double irradiance, double time, double exposed_percent) {
+        return irradiance * time * Constants.AVERAGE_HUMAN_SURFACE_AREA * exposed_percent;
+    }
+    
+    public static double irradianceToJoules(double irradiance, double time) {
+        return irradiance * time * Constants.AVERAGE_HUMAN_SURFACE_AREA * Constants.DEFAULT_EXPOSED_SKIN_PERCENT;
+    }
+    
     public static double getError(double actual, double result) {
         return Math.abs(actual - result) / actual;
     }

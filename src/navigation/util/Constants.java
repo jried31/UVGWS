@@ -33,4 +33,5 @@ public class Constants {
     
 //Amount of UV exposure blocked by shadows, find more concrete answers
     public final static double SHADOW_DAMPING_FACTOR = 0.5;
+    public final static double DEFAULT_EXPOSED_SKIN_PERCENT = 0.2;
 }
