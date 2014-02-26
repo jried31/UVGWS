@@ -28,7 +28,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.jsoup.nodes.*;
 import org.jsoup.select.Elements;
 
 /**
@@ -44,8 +44,8 @@ public class FastRTParser {
     // returns the minimum amount of time needed to be spent in the sun for
     // effective Vitamin D consumption.
     public String parse(LatLong location, Person person) throws URISyntaxException, ClientProtocolException, IOException {
-        String website = "http://zardoz.nilu.no/cgi-bin/olaeng/VitD_quartMEDandMED.cgi";
-
+        String website = "http://zardoz.nilu.no/cgi-bin/olaeng/VitD_quartMEDandMED_v2.cgi";
+        
         // uses current date for month and day inputs
         // TODO: change to date of activity once we decide on data format
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
@@ -78,8 +78,8 @@ public class FastRTParser {
         //qparams.add(new BasicNameValuePair("start_time", "10.5"));
         //qparams.add(new BasicNameValuePair("body_exposure", "25"));
         */
-        qparams.add(new BasicNameValuePair("month", month));
-        qparams.add(new BasicNameValuePair("mday", day));
+        qparams.add(new BasicNameValuePair("month", "31"));
+        qparams.add(new BasicNameValuePair("mday", "26"));
         qparams.add(new BasicNameValuePair("latitude", latitude));
         qparams.add(new BasicNameValuePair("longitude", longitude));
         qparams.add(new BasicNameValuePair("sza_angle", "60"));
@@ -114,13 +114,13 @@ public class FastRTParser {
 
         String responseString = "";
         String exposureTime = "";
-
+        
         try {
             HttpEntity entity = response.getEntity();
             InputStream instream = entity.getContent();
             InputStreamReader isr = new InputStreamReader(instream);
             BufferedReader rd = new BufferedReader(isr);
-            StringBuffer buffer = new StringBuffer();
+            StringBuffer buffer = new StringBuffer();          
             try {
                 String line = "";
                 while ((line = rd.readLine()) != null) {
@@ -137,17 +137,19 @@ public class FastRTParser {
             }
 
             Document doc = Jsoup.parse(responseString);
-            Elements content = doc.getElementsByTag("p");
+            Elements content = doc.getElementsContainingOwnText("Exposure time (hours:minutes)");
+            Element actual = content.first();
 
             // Resides on the last node of the <p> subtree, which is not an element.
             // Request returns in hours:minutes format.
-            System.out.println(content.last().childNode(content.last().childNodeSize() - 1));
-            exposureTime = content.last().childNode(content.last().childNodeSize() - 1).toString();
+            //System.out.println(content.last().childNode(content.last().childNodeSize() - 1));
+            exposureTime = content.first().nextElementSibling().nextSibling().toString();
+            System.out.println(exposureTime);
             EntityUtils.consume(entity);
         } finally {
             response.close();
         }
-
+        
         return exposureTime;
     }
 
