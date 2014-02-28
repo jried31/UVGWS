@@ -36,7 +36,8 @@ public class Segment {
      * each segment
      */
     public void initialize() throws SQLException,Exception {
-        if (Util.getDistance(getStart_point(), getEnd_point()) > MAX_SEGMENT_SIZE){
+        double distance=Util.getDistance(getStart_point(), getEnd_point()) ;
+        if (distance > MAX_SEGMENT_SIZE){
             split();
             return;
         }
@@ -112,16 +113,16 @@ public class Segment {
      * @return true if this segment is in the shadow, otherwise false
      */
     public boolean isInShadow() throws Exception {
-        SunUtil sunUtil = new SunUtil();
         //Get the Buildings within segment
         BoundingBox bb = new BoundingBox(start_location, end_location,80,120 ); //80 feet buffer between segment end points 
         BuildingUtils bbutil = new BuildingUtils();
-        
+        bbutil.setEndpointBuffer(528);//settting endpoint buffer to 100 fee
         LatLong midSegmentPosition = getMidpoint();
+        SunUtil sunUtil = new SunUtil(midSegmentPosition);
         
         //Compute Sun Angles
         Calendar calendar = Calendar.getInstance();
-        sunUtil.computeSunAngles(calendar, midSegmentPosition);
+        sunUtil.computeSunAngles();//calendar, midSegmentPosition);
         
 
          // creates custom bounding box using input bounding box coordinates

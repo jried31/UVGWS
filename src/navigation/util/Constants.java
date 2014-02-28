@@ -29,5 +29,6 @@ public class Constants {
     public final static double AVERAGE_HUMAN_SURFACE_AREA = 1.73; // square meters
     
     //value is only an estimate, no study found at this time
-    public final static double DEFAULT_EXPOSED_SKIN_PERCENT = 0.2;
+    public final static double DEFAULT_EXPOSED_SKIN_PERCENT = 0.2; 
+    public final static double DEGREE_VARIANCE_PER_FEET = 0.0000027;
 }
