@@ -81,7 +81,7 @@ public class SunUtil {
     
     public void computeSunAngles() throws ParseException{
         updateCurrentTime();
-        String time = "13:30";//((hour.length()==1?"0"+hour:hour)+":"+(minute.length()==1?"00":(minute.charAt(0)+"0")));
+        String time = ((hour.length()==1?"0"+hour:hour)+":"+(minute.length()==1?"00":(minute.charAt(0)+"0")));//"13:30";//
         SunAngle angle = sunAngles.get(time);
         if(angle != null){
             azimuthAngle = angle.getAzimuth();
