@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import navigation.shared.BoundingBox;
@@ -17,6 +18,7 @@ import navigation.util.Constants;
 import navigation.shared.LatLong;
 import navigation.shared.Segment;
 import navigation.util.SunUtil;
+import navigation.util.Util;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
@@ -62,12 +64,41 @@ public class Main {
                 System.out.println("Azimuth (deg from N to E) = " + sun.getAzmuthAngle());
                 System.out.println("Azimuth (deg from E to N) = " + sun.getAzmuthAngleAsCartesian());
                 System.out.println("Elevation = " + sun.getElevationAngle());
+                // Generates a bounding box
+                BoundingBox bb = new BoundingBox(segStart, segEnd, 500, 500);
+                Polygon bbPoly = bb.getBoundingBoxAsPolygon();
+                // Gets all buildings in the bounding box.
+                BuildingUtils butil = new BuildingUtils();
+                butil.setEndpointBuffer(528);
+                ArrayList<Building> bbBuildings = butil.getBuildingsInBoundingBox(bbPoly);
+                // Checks if any buildings block the sun.
+                boolean inShadow = false;
+                List<Building> sunBlockers = butil.getBuildingsBlockingSun(bbBuildings, sun, segStart);
+                for (Building buildingBlockingSun : sunBlockers) {
+                    double buildingHeight = buildingBlockingSun.getHeight();
+                    LatLong buildingCenter = buildingBlockingSun.getCenterPoint();
+                    double buildingDistance = Util.getDistance(segStart, buildingCenter);
+                    double buildingElevation = Math.atan(buildingHeight/buildingDistance);
+                    double sunElevation = sun.getElevationAngle();
+                    System.out.println("Elevation of building (rads) = " + buildingElevation);
+                    System.out.println("Elevation of sun (rads) = " + sunElevation);
+                    if (sunElevation <= buildingElevation) {
+                        System.out.println("THIS BUILDING BLOCKS THE SUN (" + buildingBlockingSun.getId() + ")");
+                        inShadow = true;
+                    }
+                    else {
+                        System.out.println("THIS BUILDING DOES NOT BLOCK THE SUN (" + buildingBlockingSun.getId() + ")");
+                    }
+                }
+                System.out.println("IN SHADOW = " + inShadow);
+                
                 // Prints isInShadow.
-                Segment seg = new Segment();
-                seg.setStart_point(segStart);
-                seg.setEnd_point(segEnd);
-                seg.initialize();
-                System.out.println("Segment In shadow: " + seg.isInShadow(time));
+                //Segment seg = new Segment();
+                //seg.setStart_point(segStart);
+                //seg.setEnd_point(segEnd);
+                //seg.initialize();
+                //System.out.println("Segment In shadow: " + seg.isInShadow(time));
+                
                 System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
             }
             

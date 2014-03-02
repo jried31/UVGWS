@@ -96,7 +96,7 @@ public class BuildingUtils {
         
                     //We have segment midpoint and Azimuth angle, so we will make a line segment +- position
        Coordinate[] lineSegment=null;
-       if (azmuthCartesian >= 0 && azmuthCartesian <= 90) {
+       /*if (azmuthCartesian >= 0 && azmuthCartesian <= 90) {
             lineSegment=new Coordinate[] {
                 new Coordinate(myLocation.getLongitude(), myLocation.getLatitude()), 
                 new Coordinate(Math.sin(azmuthCartesianRad)*degreeVariance - myLocation.getLongitude(), Math.cos(azmuthCartesianRad)*degreeVariance - myLocation.getLatitude())
@@ -116,7 +116,11 @@ public class BuildingUtils {
                 new Coordinate(myLocation.getLongitude(), myLocation.getLatitude()), 
                 new Coordinate(myLocation.getLongitude() + Math.sin(azmuthCartesianRad)*degreeVariance, myLocation.getLatitude() - Math.cos(azmuthCartesianRad)*degreeVariance)
             };
-        }
+        }*/
+       lineSegment=new Coordinate[] {
+                new Coordinate(myLocation.getLongitude(), myLocation.getLatitude()), 
+                new Coordinate(myLocation.getLongitude() + Math.cos(azmuthCartesianRad)*degreeVariance, myLocation.getLatitude() + Math.sin(azmuthCartesianRad)*degreeVariance)
+            };
                          
        System.out.println("My Location: "+myLocation.getLatitude() + ", " + myLocation.getLongitude());
        for(int i = 0;i < 2;i++){
