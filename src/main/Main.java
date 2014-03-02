@@ -4,6 +4,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.Set;
 import navigation.shared.BoundingBox;
@@ -14,6 +16,7 @@ import navigation.shared.Building;
 import navigation.util.Constants;
 import navigation.shared.LatLong;
 import navigation.shared.Segment;
+import navigation.util.SunUtil;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
@@ -40,9 +43,40 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Remember All inputs require Longitude, Latitude order when location inputs go to Geotools (eg queries)
  */
 public class Main {
+    
+        public static void testIsInShadow() throws Exception
+        {
+            // Ronald Regan Medical Center:
+            LatLong segStart = new LatLong(34.066694, -118.445256);
+            LatLong segEnd = new LatLong(34.066693, -118.445256);
+
+            // Test at different times of day.
+            for (int hour = 5; hour < 19; hour++) {
+                SunUtil sun = new SunUtil(segStart);
+                Calendar time = new GregorianCalendar(2014, 3, 21, hour, 0, 0);
+                sun.computeSunAngles(time, segEnd);
+                System.out.println("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV");
+                // Prints time.
+                System.out.println("Time = " + time.get(Calendar.HOUR_OF_DAY) + ":00");
+                // Prints sun angles.
+                System.out.println("Azimuth (deg from N to E) = " + sun.getAzmuthAngle());
+                System.out.println("Azimuth (deg from E to N) = " + sun.getAzmuthAngleAsCartesian());
+                System.out.println("Elevation = " + sun.getElevationAngle());
+                // Prints isInShadow.
+                Segment seg = new Segment();
+                seg.setStart_point(segStart);
+                seg.setEnd_point(segEnd);
+                seg.initialize();
+                System.out.println("Segment In shadow: " + seg.isInShadow(time));
+                System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            }
+            
+            System.exit(0);
+        }
 
 	public static void main(String args[]) throws Exception
 	{
+            testIsInShadow();
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
             LatLong end_location = new LatLong(34.192399, -118.444362);//33.878467, -118.375152);//33.883924, -118.367711);//33.876370, -118.349886);//33.883924, -118.367711);//33.879524, -118.372789);//33.878467, -118.375152);//33.877822, -118.377025);
             
@@ -51,7 +85,6 @@ public class Main {
             s1.setEnd_point(end_location);
             s1.initialize();
             s1.isInShadow();
-            
             
             if(true)return;
             

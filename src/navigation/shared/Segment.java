@@ -145,6 +145,57 @@ public class Segment {
                 //Compute the elevation angle between the building and the person angle of the building
                 double elevAngleBuilding = Math.atan((building.getHeight() - Constants.AVERAGE_PERSON_HEIGHT) / getDistanceToBuilding(midSegmentPosition, building));
                 //elevation angle of the building/sun from the midpoint of the segment slice
+                System.out.println("Elevation of building: " + elevAngleBuilding);
+                System.out.println("Elevation of sun: " + sunUtil.getElevationAngle());
+                if (elevAngleBuilding >= sunUtil.getElevationAngle()) {
+                    return true;
+                }
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(Segment.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    /**
+     * @param calendar time of year and time of day to compute shadow angles.
+     * @return true if this segment is in the shadow, otherwise false
+     */
+    public boolean isInShadow(Calendar calendar) throws Exception {
+        //Get the Buildings within segment
+        BoundingBox bb = new BoundingBox(start_location, end_location,80,120 ); //80 feet buffer between segment end points 
+        BuildingUtils bbutil = new BuildingUtils();
+        bbutil.setEndpointBuffer(528);//settting endpoint buffer to 100 fee
+        LatLong midSegmentPosition = getMidpoint();
+        SunUtil sunUtil = new SunUtil(midSegmentPosition);
+        
+        //Compute Sun Angles
+        //Calendar calendar = Calendar.getInstance();
+        sunUtil.computeSunAngles(calendar, midSegmentPosition);//calendar, midSegmentPosition);
+        
+
+         // creates custom bounding box using input bounding box coordinates
+        Polygon polygon = bb.getBoundingBoxAsPolygon();
+        ArrayList<Building> list = bbutil.getBuildingsInBoundingBox(polygon);
+        list = bbutil.sortByDistance(list, midSegmentPosition);
+        /*
+     Returns true if it finds a building along the azimuth line. Uses the method of intersecting lines
+     of each side of the polygon. The polygon is made up of 4 points. Total number of lines that
+     can connect the 4 points is 6. The algorithm checks if the src lat long, give the azimuth
+     angle will intersect any 4/6 lines from the polygon. This is more robust than method two.
+     The method will return a list of buildings that are in line with the azimuth angle
+     */
+
+        //Grab the relevant buildings (which are all buildings that intersect the Sun and the persons position
+        list = bbutil.getBuildingsBlockingSun(list, sunUtil,midSegmentPosition);
+        
+        try {
+            for (Building building : list) {
+                //Compute the elevation angle between the building and the person angle of the building
+                double elevAngleBuilding = Math.atan((building.getHeight() - Constants.AVERAGE_PERSON_HEIGHT) / getDistanceToBuilding(midSegmentPosition, building));
+                //elevation angle of the building/sun from the midpoint of the segment slice
+                System.out.println("Elevation of building: " + elevAngleBuilding);
+                System.out.println("Elevation of sun: " + sunUtil.getElevationAngle());
                 if (elevAngleBuilding >= sunUtil.getElevationAngle()) {
                     return true;
                 }
