@@ -101,7 +101,10 @@ public class Main {
                 
                 System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
             }
-            
+            // TODOS:
+            // 1. Integrate this funcion with the segment UV algorithm.
+            // 2. Verify the split() function works as expected.
+            // 3. Pull UV irradence data from parse.com in the SunUtil class.
             System.exit(0);
         }
 
