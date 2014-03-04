@@ -2,8 +2,8 @@ package parse.almonds;
 
 public class Parse 
 {
-	private static String mApplicationId;
-	private static String mRestAPIKey;
+	private static String mApplicationId="WbDp7JEI27askcOboEqer63TlIPGKLmNZQM92ivU";
+	private static String mRestAPIKey="c2x2ZDhw8XslE0hZVvu5eTlE5Fkp0IYKoY5jSJIW";;
 	
 	private static final String PARSE_API_URL = "https://api.parse.com";
 	private static final String PARSE_API_URL_CLASSES = "/1/classes/";
@@ -12,10 +12,8 @@ public class Parse
 	 * @param applicationId
 	 * @param restAPIKey
 	 */
-	static public void initialize(String applicationId, String restAPIKey)
+	static public void initialize()
 	{
-		mApplicationId = applicationId;
-		mRestAPIKey = restAPIKey;
 	}
 	
 	static public String getApplicationId() {return mApplicationId;}

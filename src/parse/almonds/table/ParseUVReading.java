@@ -13,10 +13,14 @@ package parse.almonds.table;
 
 public class ParseUVReading{
 	public static final String UVI = "uvi",
-			LOCATION = "location",
-			TIMESTAMP = "timestamp",
-			ENVIRONMENT = "environment";
-	
+            LOCATION = "location",
+            TIMESTAMP = "timestamp",
+            ENVIRONMENT = "environment",
+            CLASS_LABEL_IN_SUN = "in_sun",
+            CLASS_LABEL_IN_SHADE = "in_shade",
+            CLASS_LABEL_IN_CLOUD = "in_cloud",
+            TABLE_UV_DATA="UVData";
+        
 	public ParseUVReading() {
 	}
 }

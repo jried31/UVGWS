@@ -36,6 +36,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import parse.almonds.Parse;
 import parse.almonds.ParseObject;
 import parse.almonds.ParseQuery;
 import parse.almonds.table.ParseUVReading;
@@ -111,10 +112,13 @@ public class SunUtil {
     }
     
     public void updateUVI() throws parse.almonds.ParseException{
-        Constants.InitializeParse();
+        Parse.initialize();
         
-        ParseQuery phenomenaQueryObject = new ParseQuery(Constants.TABLE_UV_DATA);
+        ParseQuery phenomenaQueryObject = new ParseQuery(ParseUVReading.TABLE_UV_DATA);
         phenomenaQueryObject.orderByDescending(ParseUVReading.TIMESTAMP);
+        phenomenaQueryObject.whereEqualTo(ParseUVReading.ENVIRONMENT, ParseUVReading.CLASS_LABEL_IN_SUN);
+        phenomenaQueryObject.whereEqualTo(ParseUVReading.ENVIRONMENT, ParseUVReading.CLASS_LABEL_IN_CLOUD);
+        phenomenaQueryObject.whereEqualTo(ParseUVReading.ENVIRONMENT, ParseUVReading.CLASS_LABEL_IN_SHADE);
 	phenomenaQueryObject.setLimit(30);
         List<ParseObject> uvDataList = phenomenaQueryObject.find();
                     
@@ -134,21 +138,21 @@ public class SunUtil {
 
             //if (time1 - time2 <= 120000) {
             if(environment != null){
-                if (environment.equals(Constants.CLASS_LABEL_IN_SUN)) {
+                if (environment.equals(ParseUVReading.CLASS_LABEL_IN_SUN)) {
                     if (sunCount <= 1) {
                         meanUVISun = uvi;
                     } else {
                         meanUVISun = (uvi + meanUVISun * (sunCount - 1)) / sunCount;
                     }
                     sunCount++;
-                } else if (environment.equals(Constants.CLASS_LABEL_IN_CLOUD)) {
+                } else if (environment.equals(ParseUVReading.CLASS_LABEL_IN_CLOUD)) {
                     if (cloudCount <= 1) {
                         meanUVICloud = uvi;
                     } else {
                         meanUVICloud = (uvi + meanUVICloud * (cloudCount - 1)) / cloudCount;
                     }
                     cloudCount++;
-                } else if (environment.equals(Constants.CLASS_LABEL_IN_SHADE)) {
+                } else if (environment.equals(ParseUVReading.CLASS_LABEL_IN_SHADE)) {
                     if (shadeCount <= 1) {
                         meanUVIShade = uvi;
                     } else {
