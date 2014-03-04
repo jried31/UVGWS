@@ -14,6 +14,7 @@ import navigation.shared.Building;
 import navigation.util.Constants;
 import navigation.shared.LatLong;
 import navigation.shared.Segment;
+import navigation.util.SunUtil;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
@@ -45,6 +46,9 @@ public class Main {
 	{
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
             LatLong end_location = new LatLong(34.192399, -118.444362);//33.878467, -118.375152);//33.883924, -118.367711);//33.876370, -118.349886);//33.883924, -118.367711);//33.879524, -118.372789);//33.878467, -118.375152);//33.877822, -118.377025);
+            
+            SunUtil util = new SunUtil(start_location);
+            
             
             Segment s1 = new Segment();
             s1.setStart_point(start_location);

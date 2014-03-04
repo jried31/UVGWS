@@ -12,9 +12,14 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import navigation.shared.LatLong;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -31,13 +36,19 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import parse.almonds.ParseObject;
+import parse.almonds.ParseQuery;
+import parse.almonds.table.ParseUVReading;
 
 /**
  *
  * @author jried31
  */
 public class SunUtil {
-    private double elevAngleSun=-1,azimuthAngle=-1;
+    private double elevAngleSun=-1,azimuthAngle=-1,
+            meanUVISun = 0,
+	        meanUVIShade = 0,
+                meanUVICloud = 0;
     private LatLong location=null;
     private String month;
     private String day;
@@ -47,10 +58,26 @@ public class SunUtil {
     private String city = null;
     private String state = null;
     private String place = null;
+    
     private final String interval = "10";
     private String referrerURI="http://aa.usno.navy.mil/data/docs/AltAz.php";
     private String url ="http://aa.usno.navy.mil/cgi-bin/aa_altazw.pl?FFX=1&obj=INTERVAL&xxy=2014&xxm=2&xxd=25&xxi=10&st=CA&place=los+angeles&ZZZ=END";
-                        
+            
+    private Timer timer=null;
+    private TimerTask uviTaskHandler = new TimerTask(){
+         public void run() {
+             try {
+                 updateUVI();
+             } catch (parse.almonds.ParseException ex) {
+                 Logger.getLogger(SunUtil.class.getName()).log(Level.SEVERE, null, ex);
+             }
+            //timer.scheduleAtFixedRate(uviTaskHandler, 1000, Constants.UVI_UPDATE_INTERVAL);
+        }
+    };
+    public double getUVISun(){return meanUVISun;}
+    public double getUVIShade(){return meanUVIShade;}
+    public double getUVICloud(){return meanUVICloud;}
+    
     public double getElevationAngle(){return elevAngleSun;}
     public double getAzmuthAngle(){return azimuthAngle;}
     public double getAzmuthAngleAsCartesian(){
@@ -66,17 +93,72 @@ public class SunUtil {
         }else{
             azimuthCartesian = 90;
         }
-              
         return azimuthCartesian;
     }
     
     public double convertDegreeToRadian(double degree){
         return degree*(Math.PI/180);
     }
-    public SunUtil(LatLong location) throws ParseException{
+    public SunUtil(LatLong location) throws ParseException, parse.almonds.ParseException{
         this.location = location;
         //Retrieve the Sun Angle data from Website
         getSunAngleData();
+        updateUVI();
+        /*if(timer == null){
+            timer = new Timer();
+            //timer.scheduleAtFixedRate(this.uviTaskHandler, 1000, Constants.UVI_UPDATE_INTERVAL);
+        }*/
+    }
+    
+    public void updateUVI() throws parse.almonds.ParseException{
+        Constants.InitializeParse();
+        
+        ParseQuery phenomenaQueryObject = new ParseQuery(Constants.TABLE_UV_DATA);
+        phenomenaQueryObject.orderByDescending(ParseUVReading.TIMESTAMP);
+	phenomenaQueryObject.setLimit(30);
+        List<ParseObject> uvDataList = phenomenaQueryObject.find();
+                    
+        long time1, time2;
+        Date now = new Date();
+        time1 = now.getTime();
+        int sunCount=0,
+                shadeCount = 0,
+                cloudCount = 0;
+        
+        for (int i = 0; i < uvDataList.size();i++){
+            ParseObject uv = uvDataList.get(i);
+            Date timestamp = uv.getDate(ParseUVReading.TIMESTAMP);
+            String environment = uv.getString(ParseUVReading.ENVIRONMENT);
+            int uvi = uv.getInt(ParseUVReading.UVI);
+            //time2 = timestamp.getTime();
+
+            //if (time1 - time2 <= 120000) {
+            if(environment != null){
+                if (environment.equals(Constants.CLASS_LABEL_IN_SUN)) {
+                    if (sunCount <= 1) {
+                        meanUVISun = uvi;
+                    } else {
+                        meanUVISun = (uvi + meanUVISun * (sunCount - 1)) / sunCount;
+                    }
+                    sunCount++;
+                } else if (environment.equals(Constants.CLASS_LABEL_IN_CLOUD)) {
+                    if (cloudCount <= 1) {
+                        meanUVICloud = uvi;
+                    } else {
+                        meanUVICloud = (uvi + meanUVICloud * (cloudCount - 1)) / cloudCount;
+                    }
+                    cloudCount++;
+                } else if (environment.equals(Constants.CLASS_LABEL_IN_SHADE)) {
+                    if (shadeCount <= 1) {
+                        meanUVIShade = uvi;
+                    } else {
+                        meanUVIShade = (uvi + meanUVIShade * (shadeCount - 1)) / shadeCount;
+                    }
+                    shadeCount++;
+                }
+            }
+            //}
+        }
     }
     
     public void computeSunAngles() throws ParseException{

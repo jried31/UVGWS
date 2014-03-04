@@ -5,6 +5,8 @@
  */
 package navigation.util;
 
+import parse.almonds.Parse;
+
 /**
  *
  * @author user510
@@ -31,4 +33,17 @@ public class Constants {
     //value is only an estimate, no study found at this time
     public final static double DEFAULT_EXPOSED_SKIN_PERCENT = 0.2; 
     public final static double DEGREE_VARIANCE_PER_FEET = 0.0000027;
+
+    static public String TABLE_UV_DATA = "UVData";
+
+    public static final String CLASS_LABEL_IN_SUN = "in_sun";
+    public static final String CLASS_LABEL_IN_SHADE = "in_shade";
+    public static final String CLASS_LABEL_IN_CLOUD = "in_cloud";
+    public static long UVI_UPDATE_INTERVAL= 1800000;
+
+    public static void InitializeParse(){
+        //App Ids for Connecting to the Parse DB
+        Parse.initialize("WbDp7JEI27askcOboEqer63TlIPGKLmNZQM92ivU", 	//Application ID
+            "c2x2ZDhw8XslE0hZVvu5eTlE5Fkp0IYKoY5jSJIW"); 	//Rest API Key
+    }
 }

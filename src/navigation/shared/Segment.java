@@ -85,9 +85,7 @@ public class Segment {
     
     @Override
     public String toString() {
-
         return start_location + "," + end_location + "," + averageUvi + "," + no_of_readings;
-
     }
 
     /**
@@ -116,7 +114,7 @@ public class Segment {
         //Get the Buildings within segment
         BoundingBox bb = new BoundingBox(start_location, end_location,80,120 ); //80 feet buffer between segment end points 
         BuildingUtils bbutil = new BuildingUtils();
-        bbutil.setEndpointBuffer(528);//settting endpoint buffer to 100 fee
+        bbutil.setEndpointBuffer(528);//528feet is the length of this Azmuth line
         LatLong midSegmentPosition = getMidpoint();
         SunUtil sunUtil = new SunUtil(midSegmentPosition);
         
