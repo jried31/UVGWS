@@ -46,6 +46,11 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class Main {
     
+        
+        /**
+         * @author Sam
+         * @throws Exception 
+         */
         public static void testIsInShadow() throws Exception
         {
             // Ronald Regan Medical Center:
@@ -107,10 +112,48 @@ public class Main {
             // 3. Pull UV irradence data from parse.com in the SunUtil class.
             System.exit(0);
         }
+        
+        /**
+         * @author Sam
+         * @throws Exception 
+         */
+        public static void testSegment() throws Exception
+        {
+            // Near Ronald Regan Medical Center:
+            // * THIS SEGMENT SHOULD BE SPLIT!
+            LatLong segStart = new LatLong(34.059026, -118.443059);
+            LatLong segEnd = new LatLong(34.058794, -118.443914);
+            
+            // Creates an uninitialized segment.
+            Segment s = new Segment();
+            
+            // Test the segment at various times of day.
+            for (int hour = 13; hour <= 18; hour++) {
+                Calendar startTime = new GregorianCalendar(2014, 3, 21, hour, 0, 0);
+                Calendar endTime = new GregorianCalendar(2014, 3, 21, hour, 1, 0);
+                s.initialize(segStart, segEnd, startTime, endTime);
+                System.out.println("VVVVVVVVVVVVVVVVVVVVVVVVV");
+                System.out.println("Time: " + startTime.get(Calendar.HOUR_OF_DAY));
+                System.out.println("Start Point: " + s.getStart_point());
+                System.out.println("End point: " + s.getEnd_point());
+                System.out.println("Distance: " + Util.getDistance(segStart, segEnd));
+                System.out.println("Segment slices: " + s.getNo_of_readings());
+                System.out.println("Slices in sun: " + s.getNumTimesInSun());
+                System.out.println("Slices in shadow: " + s.getNumTimesInShadow());
+                System.out.println("Distance in sun: " + s.getDistanceInSun());
+                System.out.println("Distance in shadow: " + s.getDistanceInShadow());
+                System.out.println("Time in sun: " + s.getDurationInSun());
+                System.out.println("Time in shadow: " + s.getDurationInShadow());
+                System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^");
+                break;
+            }
+            
+            System.exit(0);
+        }
 
 	public static void main(String args[]) throws Exception
 	{
-            testIsInShadow();
+            testSegment();
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
             LatLong end_location = new LatLong(34.192399, -118.444362);//33.878467, -118.375152);//33.883924, -118.367711);//33.876370, -118.349886);//33.883924, -118.367711);//33.879524, -118.372789);//33.878467, -118.375152);//33.877822, -118.377025);
             
