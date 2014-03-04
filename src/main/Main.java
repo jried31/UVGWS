@@ -4,6 +4,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import navigation.shared.BoundingBox;
@@ -15,6 +18,7 @@ import navigation.util.Constants;
 import navigation.shared.LatLong;
 import navigation.shared.Segment;
 import navigation.util.SunUtil;
+import navigation.util.Util;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
@@ -41,9 +45,115 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Remember All inputs require Longitude, Latitude order when location inputs go to Geotools (eg queries)
  */
 public class Main {
+    
+        
+        /**
+         * @author Sam
+         * @throws Exception 
+         */
+        public static void testIsInShadow() throws Exception
+        {
+            // Ronald Regan Medical Center:
+            LatLong segStart = new LatLong(34.066694, -118.445256);
+            LatLong segEnd = new LatLong(34.066693, -118.445256);
+
+            // Test at different times of day.
+            for (int hour = 5; hour < 19; hour++) {
+                SunUtil sun = new SunUtil(segStart);
+                Calendar time = new GregorianCalendar(2014, 3, 21, hour, 0, 0);
+                sun.computeSunAngles(time, segEnd);
+                System.out.println("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV");
+                // Prints time.
+                System.out.println("Time = " + time.get(Calendar.HOUR_OF_DAY) + ":00");
+                // Prints sun angles.
+                System.out.println("Azimuth (deg from N to E) = " + sun.getAzmuthAngle());
+                System.out.println("Azimuth (deg from E to N) = " + sun.getAzmuthAngleAsCartesian());
+                System.out.println("Elevation = " + sun.getElevationAngle());
+                // Generates a bounding box
+                BoundingBox bb = new BoundingBox(segStart, segEnd, 500, 500);
+                Polygon bbPoly = bb.getBoundingBoxAsPolygon();
+                // Gets all buildings in the bounding box.
+                BuildingUtils butil = new BuildingUtils();
+                butil.setEndpointBuffer(528);
+                ArrayList<Building> bbBuildings = butil.getBuildingsInBoundingBox(bbPoly);
+                // Checks if any buildings block the sun.
+                boolean inShadow = false;
+                List<Building> sunBlockers = butil.getBuildingsBlockingSun(bbBuildings, sun, segStart);
+                for (Building buildingBlockingSun : sunBlockers) {
+                    double buildingHeight = buildingBlockingSun.getHeight();
+                    LatLong buildingCenter = buildingBlockingSun.getCenterPoint();
+                    double buildingDistance = Util.getDistance(segStart, buildingCenter);
+                    double buildingElevation = Math.atan(buildingHeight/buildingDistance);
+                    double sunElevation = sun.getElevationAngle();
+                    System.out.println("Elevation of building (rads) = " + buildingElevation);
+                    System.out.println("Elevation of sun (rads) = " + sunElevation);
+                    if (sunElevation <= buildingElevation) {
+                        System.out.println("THIS BUILDING BLOCKS THE SUN (" + buildingBlockingSun.getId() + ")");
+                        inShadow = true;
+                    }
+                    else {
+                        System.out.println("THIS BUILDING DOES NOT BLOCK THE SUN (" + buildingBlockingSun.getId() + ")");
+                    }
+                }
+                System.out.println("IN SHADOW = " + inShadow);
+                
+                // Prints isInShadow.
+                //Segment seg = new Segment();
+                //seg.setStart_point(segStart);
+                //seg.setEnd_point(segEnd);
+                //seg.initialize();
+                //System.out.println("Segment In shadow: " + seg.isInShadow(time));
+                
+                System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            }
+            // TODOS:
+            // 1. Integrate this funcion with the segment UV algorithm.
+            // 2. Verify the split() function works as expected.
+            // 3. Pull UV irradence data from parse.com in the SunUtil class.
+            System.exit(0);
+        }
+        
+        /**
+         * @author Sam
+         * @throws Exception 
+         */
+        public static void testSegment() throws Exception
+        {
+            // Near Ronald Regan Medical Center:
+            // * THIS SEGMENT SHOULD BE SPLIT!
+            LatLong segStart = new LatLong(34.059026, -118.443059);
+            LatLong segEnd = new LatLong(34.058794, -118.443914);
+            
+            // Creates an uninitialized segment.
+            Segment s = new Segment();
+            
+            // Test the segment at various times of day.
+            for (int hour = 13; hour <= 18; hour++) {
+                Calendar startTime = new GregorianCalendar(2014, 3, 21, hour, 0, 0);
+                Calendar endTime = new GregorianCalendar(2014, 3, 21, hour, 1, 0);
+                s.initialize(segStart, segEnd, startTime, endTime);
+                System.out.println("VVVVVVVVVVVVVVVVVVVVVVVVV");
+                System.out.println("Time: " + startTime.get(Calendar.HOUR_OF_DAY));
+                System.out.println("Start Point: " + s.getStart_point());
+                System.out.println("End point: " + s.getEnd_point());
+                System.out.println("Distance: " + Util.getDistance(segStart, segEnd));
+                System.out.println("Segment slices: " + s.getNo_of_readings());
+                System.out.println("Slices in sun: " + s.getNumTimesInSun());
+                System.out.println("Slices in shadow: " + s.getNumTimesInShadow());
+                System.out.println("Distance in sun: " + s.getDistanceInSun());
+                System.out.println("Distance in shadow: " + s.getDistanceInShadow());
+                System.out.println("Time in sun: " + s.getDurationInSun());
+                System.out.println("Time in shadow: " + s.getDurationInShadow());
+                System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^");
+                break;
+            }
+            
+            System.exit(0);
+        }
 
 	public static void main(String args[]) throws Exception
 	{
+            testSegment();
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
             LatLong end_location = new LatLong(34.192399, -118.444362);//33.878467, -118.375152);//33.883924, -118.367711);//33.876370, -118.349886);//33.883924, -118.367711);//33.879524, -118.372789);//33.878467, -118.375152);//33.877822, -118.377025);
             
@@ -55,7 +165,6 @@ public class Main {
             s1.setEnd_point(end_location);
             s1.initialize();
             s1.isInShadow();
-            
             
             if(true)return;
             

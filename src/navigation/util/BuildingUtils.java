@@ -95,31 +95,13 @@ public class BuildingUtils {
                 azmuthCartesianRad = sunUtil.convertDegreeToRadian(azmuthCartesian);
         
                     //We have segment midpoint and Azimuth angle, so we will make a line segment +- position
-       Coordinate[] lineSegment=null;
-       if (azmuthCartesian >= 0 && azmuthCartesian <= 90) {
-            lineSegment=new Coordinate[] {
-                new Coordinate(myLocation.getLongitude(), myLocation.getLatitude()), 
-                new Coordinate(Math.sin(azmuthCartesianRad)*degreeVariance - myLocation.getLongitude(), Math.cos(azmuthCartesianRad)*degreeVariance - myLocation.getLatitude())
-            };
-        } else if (azmuthCartesian > 90 && azmuthCartesian <= 180) {            
-            lineSegment=new Coordinate[] {
-                new Coordinate(myLocation.getLongitude(), myLocation.getLatitude()), 
-                new Coordinate(Math.sin(azmuthCartesianRad)*degreeVariance - myLocation.getLongitude(), myLocation.getLatitude() + Math.cos(azmuthCartesianRad)*degreeVariance)
-            };
-        } else if (azmuthCartesian > 180 && azmuthCartesian <= 270) {
-            lineSegment=new Coordinate[] {
+        Coordinate[] lineSegment = new Coordinate[] {
                 new Coordinate(myLocation.getLongitude(), myLocation.getLatitude()), 
                 new Coordinate(myLocation.getLongitude() + Math.cos(azmuthCartesianRad)*degreeVariance, myLocation.getLatitude() + Math.sin(azmuthCartesianRad)*degreeVariance)
             };
-        } else if (azmuthCartesian > 270 && azmuthCartesian <= 360) {
-            lineSegment=new Coordinate[] {
-                new Coordinate(myLocation.getLongitude(), myLocation.getLatitude()), 
-                new Coordinate(myLocation.getLongitude() + Math.sin(azmuthCartesianRad)*degreeVariance, myLocation.getLatitude() - Math.cos(azmuthCartesianRad)*degreeVariance)
-            };
-        }
                          
-       System.out.println("My Location: "+myLocation.getLatitude() + ", " + myLocation.getLongitude());
-       for(int i = 0;i < 2;i++){
+        System.out.println("My Location: "+myLocation.getLatitude() + ", " + myLocation.getLongitude());
+        for(int i = 0;i < 2;i++){
             System.out.println("Azmuth Line To Sun Point("+i+1+"): "+lineSegment[i].x + ", " + lineSegment[i].y);
         }   
        

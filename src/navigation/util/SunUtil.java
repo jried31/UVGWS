@@ -181,10 +181,12 @@ public class SunUtil {
         double latitude = position.getLatitude();
         double longitude = position.getLongitude();
         
-        //int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
         //double LT = getTimeInHours();
-        final int dayOfYear = 347; //hard coded day of year
-        final double LT = 10.25; //hard coded time
+        //final int dayOfYear = 347; //hard coded day of year
+        double LT = calendar.get(Calendar.HOUR_OF_DAY);
+        LT += 0.01 * calendar.get(Calendar.MINUTE);
+        //final double LT = 10.25; //hard coded time
         
         final int gmt_adjust = -8; //neither
         final double LSTM = 15 * gmt_adjust; //local solar time meridian, in degrees
