@@ -5,6 +5,8 @@
  */
 package navigation.util;
 
+import parse.almonds.Parse;
+
 /**
  *
  * @author user510
@@ -29,8 +31,16 @@ public class Constants {
     public final static double AVERAGE_HUMAN_SURFACE_AREA = 1.73; // square meters
     
     //value is only an estimate, no study found at this time
+<<<<<<< HEAD
     public final static double DEFAULT_EXPOSED_SKIN_PERCENT = 0.2;
     
     //Amount of UV exposure blocked by shadows, find more concrete answers
     public final static double SHADOW_DAMPING_FACTOR = 0.5;
 }
+=======
+    public final static double DEFAULT_EXPOSED_SKIN_PERCENT = 0.2; 
+    public final static double DEGREE_VARIANCE_PER_FEET = 0.0000027;
+
+    public static long UVI_UPDATE_INTERVAL= 1800000;
+}
+>>>>>>> e642667be365d3f24c79bff05857b7b004d0de7b

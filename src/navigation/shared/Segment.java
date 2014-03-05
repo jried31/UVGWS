@@ -22,6 +22,8 @@ import java.lang.IllegalArgumentException;
  */
 public class Segment {
 
+    private Calendar start_time;
+    private Calendar end_time;
     private LatLong start_location;
     private LatLong end_location;
     private Calendar start_time;
@@ -31,6 +33,7 @@ public class Segment {
     private double effectiveUVI = 0;
     private int no_of_readings = 0;
     private int numTimesInShadow=0, numTimesInSun=0;
+    private int durationInShadow, durationInSun; // in sec
     private double distanceInShadow, distanceInSun; //in km
     public static final double MAX_SEGMENT_SIZE = .005;//in km
     private int numSegmentSlices = 1; //a segment counts as a segment slice itself
@@ -40,11 +43,30 @@ public class Segment {
      * each segment
      */
     public void initialize() throws SQLException,Exception {
-        if (Util.getDistance(getStart_point(), getEnd_point()) > MAX_SEGMENT_SIZE){
+        double distance=Util.getDistance(getStart_point(), getEnd_point()) ;
+        if (distance > MAX_SEGMENT_SIZE){
             split();
             return;
         }
-        getReadings();
+        else {
+            getReadings();
+        }
+    }
+    
+    public void initialize(LatLong startPoint, LatLong endPoint, Calendar startTime, Calendar endTime) throws Exception {
+        setStart_point(startPoint);
+        setEnd_point(endPoint);
+        setStart_time(startTime);
+        setEnd_time(endTime);
+        initialize();
+    }
+    
+    public int getDurationInShadow() {
+        return durationInShadow;
+    }
+    
+    public int getDurationInSun() {
+        return durationInSun;
     }
     
     //to get rid of errors, remove if unnecessary in final version
@@ -76,23 +98,41 @@ public class Segment {
     *   Splits a segment into 2 smaller (and equal sized) segments, used if the segment is too large
     */
     private void split() throws SQLException,Exception {
+            LatLong midPoint = getMidpoint();
+            int secondsDifference = timeDifferenceInSeconds(getStart_time(), getEnd_time());
+            Calendar midTime = (Calendar) getStart_time().clone();
+            midTime.add(Calendar.SECOND, secondsDifference/2);
+            
             Segment s1 = new Segment();
             s1.setStart_point(getStart_point());
-            s1.setEnd_point(getMidpoint());
+            s1.setEnd_point(midPoint);
+            s1.setStart_time(getStart_time());
+            s1.setEnd_time(midTime);
             
             Segment s2 = new Segment();
-            s2.setStart_point(getMidpoint());
+            s2.setStart_point(midPoint);
             s2.setEnd_point(getEnd_point());
+            s2.setStart_time(midTime);
+            s2.setEnd_time(getEnd_time());
             
             s1.initialize();
             s2.initialize();
             
-            this.numSegmentSlices = s1.getNumSegmentSlices() + s2.getNumSegmentSlices();
+            this.no_of_readings = s1.getNo_of_readings() + s2.getNo_of_readings();
             this.numTimesInShadow = s1.getNumTimesInShadow() + s2.getNumTimesInShadow();
             this.numTimesInSun = s1.getNumTimesInSun() + s2.getNumTimesInSun();
             this.distanceInShadow = s1.getDistanceInShadow() + s2.getDistanceInShadow();
             this.distanceInSun = s1.getDistanceInSun() + s2.getDistanceInSun();
+            this.durationInShadow = s1.getDurationInShadow() + s2.getDurationInShadow();
+            this.durationInSun = s1.getDurationInSun() + s2.getDurationInSun();
             setUvi((s1.getUvi() + s2.getUvi()) / 2);
+    }
+    
+    private int timeDifferenceInSeconds(Calendar earlier, Calendar later)
+    {
+        long dmiliseconds = later.getTimeInMillis() - earlier.getTimeInMillis();
+        int dseconds = (int) (dmiliseconds / 1000);
+        return dseconds;
     }
 
     public int getNumTimesInShadow() {
@@ -105,9 +145,7 @@ public class Segment {
     
     @Override
     public String toString() {
-
         return start_location + "," + end_location + "," + averageUvi + "," + no_of_readings;
-
     }
 
     /**
@@ -117,34 +155,37 @@ public class Segment {
      */
     public void getReadings() throws SQLException,Exception {   
         double segmentDistance = Util.getDistance(start_location, end_location);
+        int segmentDuration = timeDifferenceInSeconds(getStart_time(), getEnd_time());
+        no_of_readings = 1;
         if (isInShadow()) {
+            System.out.println("SEGMENT IN SHADOW");
             distanceInShadow = segmentDistance;
+            durationInShadow = segmentDuration;
             numTimesInShadow++;
             setUvi(1);
         } else {
+            System.out.println("SEGMENT IN SUN");
             distanceInSun = segmentDistance;
+            durationInSun = segmentDuration;
             numTimesInSun++;
             setUvi(4);
         }
-
     }
 
     /**
      * @return true if this segment is in the shadow, otherwise false
      */
     public boolean isInShadow() throws Exception {
-        SunUtil sunUtil = new SunUtil();
         //Get the Buildings within segment
         BoundingBox bb = new BoundingBox(start_location, end_location,80,120 ); //80 feet buffer between segment end points 
         BuildingUtils bbutil = new BuildingUtils();
-        
+        bbutil.setEndpointBuffer(528);//528feet is the length of this Azmuth line
         LatLong midSegmentPosition = getMidpoint();
+        SunUtil sunUtil = new SunUtil(midSegmentPosition);
         
         //Compute Sun Angles
-        Calendar calendar = Calendar.getInstance();
-        sunUtil.computeSunAngles(calendar, midSegmentPosition);
+        sunUtil.computeSunAngles(start_time, midSegmentPosition);
         
-
          // creates custom bounding box using input bounding box coordinates
         Polygon polygon = bb.getBoundingBoxAsPolygon();
         ArrayList<Building> list = bbutil.getBuildingsInBoundingBox(polygon);
@@ -165,6 +206,8 @@ public class Segment {
                 //Compute the elevation angle between the building and the person angle of the building
                 double elevAngleBuilding = Math.atan((building.getHeight() - Constants.AVERAGE_PERSON_HEIGHT) / getDistanceToBuilding(midSegmentPosition, building));
                 //elevation angle of the building/sun from the midpoint of the segment slice
+                System.out.println("Elevation of building: " + elevAngleBuilding);
+                System.out.println("Elevation of sun: " + sunUtil.getElevationAngle());
                 if (elevAngleBuilding >= sunUtil.getElevationAngle()) {
                     return true;
                 }
@@ -200,6 +243,22 @@ public class Segment {
         double middleLat = (startPoint.getLatitude() + endPoint.getLatitude()) / 2;
         double middleLong = (startPoint.getLongitude() + endPoint.getLongitude()) / 2;
         return new LatLong(middleLat, middleLong);
+    }
+    
+    public Calendar getStart_time() {
+        return start_time;
+    }
+    
+    public void setStart_time(Calendar time) {
+        start_time = (Calendar) time.clone();
+    }
+    
+    public Calendar getEnd_time() {
+        return end_time;
+    }
+    
+    public void setEnd_time(Calendar time) {
+        end_time = (Calendar) time.clone();
     }
 
     public LatLong getStart_point() {

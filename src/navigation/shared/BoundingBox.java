@@ -5,6 +5,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import navigation.shared.LatLong;
+import navigation.util.Constants;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 
 
@@ -22,16 +23,14 @@ public final class BoundingBox {
         private LatLong start = null;
         private LatLong end = null;
         private Polygon polygon = null;
-	private final double DEGREE_VARIANCE_PER_FEET = 0.0000027;
 	private double endpointBuffer = 100;
         
         //degreeVariance is the +- offset to which given a line segment it creates
-	private double degreeVariance = endpointBuffer * DEGREE_VARIANCE_PER_FEET;
+	private double degreeVariance=0;
 
 	public BoundingBox(LatLong p1, LatLong p2, double endpointBuffer,double width)
 	{
             setEndpointBuffer(endpointBuffer);
-            setDegreeVariance(endpointBuffer * DEGREE_VARIANCE_PER_FEET);
             setBoundingBox(p1, p2, endpointBuffer, width);
 	}
 	
@@ -99,7 +98,7 @@ public final class BoundingBox {
            
             
             //Compute the Polygon that represents the bounding box
-            double theta = Math.PI / 2 - alpha, distanceConversion = width*DEGREE_VARIANCE_PER_FEET;
+            double theta = Math.PI / 2 - alpha, distanceConversion = width*Constants.DEGREE_VARIANCE_PER_FEET;
             double newPointX1 = minBoundingBuffer.getLatitude() + distanceConversion * Math.sin(theta);
             double newPointY1 = minBoundingBuffer.getLongitude() - distanceConversion * Math.cos(theta);  
             
@@ -119,14 +118,6 @@ public final class BoundingBox {
                 new Coordinate(newPointY3, newPointX3),
                 new Coordinate(newPointY2, newPointX2),
                 new Coordinate(newPointY1, newPointX1)
-            
-                /*
-                new Coordinate(newPointX1, newPointY1),
-                new Coordinate(newPointX4, newPointY4),
-                new Coordinate(newPointX3, newPointY3),
-                new Coordinate(newPointX2, newPointY2),
-                new Coordinate(newPointX1, newPointY1)
-                */
             };
             
             setStartPoint(p1);
@@ -177,22 +168,17 @@ public final class BoundingBox {
 	public double getDegreeVariance() {
 		return degreeVariance;
 	}
-	public void setDegreeVariance(double degreeVariance) {
-		this.degreeVariance = degreeVariance;
-	}
 	public double getEndpointBuffer() {
 		return endpointBuffer;
 	}
 	public void setEndpointBuffer(double feet) {
 		this.endpointBuffer = feet;
+                this.degreeVariance = Constants.DEGREE_VARIANCE_PER_FEET*this.endpointBuffer;
 	}
 	public LatLong getMaxBoundingBuffer() {
 		return maxBoundingBuffer;
 	}
 	public void setMaxBoundingBuffer(LatLong max) {
 		this.maxBoundingBuffer = max;
-	}
-	public double getDEGREE_VARIANCE_PER_FEET() {
-		return DEGREE_VARIANCE_PER_FEET;
 	}
 }
