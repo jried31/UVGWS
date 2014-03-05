@@ -23,15 +23,14 @@ public class Constants {
     public final static boolean REAL_TIME = false;
 
     public final static double AVERAGE_PERSON_HEIGHT = 1.77; //1.77 meters is the average male height
-    public final static double AVERAGE_WALKING_SPEED = 1.3;//meters per second
+    public final static double AVERAGE_WALKING_SPEED = 1.3; //meters per second
     
     //data taken from European Organisation for Research and Treatment of Cancer
     public final static double AVERAGE_HUMAN_SURFACE_AREA = 1.73; // square meters
     
     //value is only an estimate, no study found at this time
-    public final static double AVERAGE_EXPOSED_SKIN_PERCENT = 0.2;
-    
-//Amount of UV exposure blocked by shadows, find more concrete answers
-    public final static double SHADOW_DAMPING_FACTOR = 0.5;
     public final static double DEFAULT_EXPOSED_SKIN_PERCENT = 0.2;
+    
+    //Amount of UV exposure blocked by shadows, find more concrete answers
+    public final static double SHADOW_DAMPING_FACTOR = 0.5;
 }

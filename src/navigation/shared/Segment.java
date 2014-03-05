@@ -259,12 +259,14 @@ public class Segment {
         return (end_time.getTimeInMillis() - start_time.getTimeInMillis()) * 1000;
     }
     
+    
     public void calculateEffectiveUVI() 
     {
         double eUVI = measuredUVI;
         try {
             if (this.isInShadow()) {
-                eUVI = eUVI * Constants.SHADOW_DAMPING_FACTOR;
+                //eUVI = eUVI * Constants.SHADOW_DAMPING_FACTOR;
+                eUVI = 1.5; //place as constant
             }
         }
         catch (Exception e) {
@@ -274,6 +276,7 @@ public class Segment {
         this.effectiveUVI = eUVI;
     }
     
+    // returns the total UV exposure (in Joules) for this segment
     public double getEffectiveUVDose() {
         Util utils = new Util();
         return utils.computeExposure(this.effectiveUVI, this.getSegmentDuration());
