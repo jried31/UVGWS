@@ -37,13 +37,17 @@ import org.geotools.geometry.jts.JTSFactoryFinder;
  * working directory.
  */
 public class BuildingUtils {
-	private final double DEGREE_VARIANCE_PER_FEET = 0.0000027;
-	private double endpointBuffer = 100;
-        
+    private double endpointBuffer=0;	
+    private double degreeVariance=0;
 
-    public BuildingUtils( ){
-        
+    public BuildingUtils(){
     }
+    
+    public void setEndpointBuffer(double feet) {
+        this.endpointBuffer = feet;
+        this.degreeVariance = Constants.DEGREE_VARIANCE_PER_FEET*this.endpointBuffer;
+    }
+        
     // Creates a custom bounding box and returns all buildings within it.
     // Input bb coordinates must be converted into UTM format prior to proccessing.
     // Processes BoundingBox as param to create new a bounding box.
@@ -85,33 +89,41 @@ public class BuildingUtils {
         // along the azimuth line we want to consider that as well
         ArrayList<Building> relevantBuildings = new ArrayList<Building>();
         
-        double azmuthAngle = sunUtil.getAzmuthAngle();
+        // Azimuth Angle Relative to Cartesian space is what we care about cause building angle is based on Cartesian
+        double azmuthAngle = sunUtil.getAzmuthAngle(),
+                azmuthCartesian = sunUtil.getAzmuthAngleAsCartesian(),
+                azmuthCartesianRad = sunUtil.convertDegreeToRadian(azmuthCartesian);
         
+                    //We have segment midpoint and Azimuth angle, so we will make a line segment +- position
+        Coordinate[] lineSegment = new Coordinate[] {
+                new Coordinate(myLocation.getLongitude(), myLocation.getLatitude()), 
+                new Coordinate(myLocation.getLongitude() + Math.cos(azmuthCartesianRad)*degreeVariance, myLocation.getLatitude() + Math.sin(azmuthCartesianRad)*degreeVariance)
+            };
+                         
+        System.out.println("My Location: "+myLocation.getLatitude() + ", " + myLocation.getLongitude());
+        for(int i = 0;i < 2;i++){
+            System.out.println("Azmuth Line To Sun Point("+i+1+"): "+lineSegment[i].x + ", " + lineSegment[i].y);
+        }   
+       
+       
+        System.out.println("Printint out relevant buildings intersecting Azmuth Line To Sun");
         for (Building building : buildings) {
             long id = building.getId();
             
             Coordinate[] corners  = building.getCorners();
-            
             GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory( null );
             LinearRing ring = geometryFactory.createLinearRing( corners );
             LinearRing holes[] = null; // use LinearRing[] to represent holes
             Polygon polygon = geometryFactory.createPolygon(ring, holes );
             
-        
-            //We have segment midpoint and Azimuth angle, so we will make a line segment +- position
-            Coordinate[] lineSegment  = new Coordinate[] {
-                new Coordinate(azmuthAngle*(myLocation.getLongitude() + endpointBuffer - myLocation.getLongitude()) + myLocation.getLatitude(), myLocation.getLongitude() + endpointBuffer), 
-                new Coordinate(azmuthAngle*(myLocation.getLongitude() - endpointBuffer - myLocation.getLongitude()) + myLocation.getLatitude(), myLocation.getLongitude() - endpointBuffer)
-            };
-            
-            for(int i = 0;i < 2;i++){
-                System.out.println("Point: "+lineSegment[i].x + ", " + lineSegment[i].y);
-            }
-            
             LineString line = geometryFactory.createLineString(lineSegment);
-
-            if(line.intersects(polygon)){
-                System.out.println("FOUND ID: " + id);
+            if(polygon.intersects(line)/*line.intersects(polygon*/){
+                System.out.println("FOUND ID: " + id+ " Center: "+building.getCenterPoint());
+                      
+                Coordinate []coord = building.getCorners();
+                for(int i = 0;i < coord.length;i++){
+                    System.out.println("Point: "+coord[i].x + ", " + coord[i].y);
+                }   
                 relevantBuildings.add(building);
             }
         }

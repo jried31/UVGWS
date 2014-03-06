@@ -82,6 +82,16 @@ public class Util {
         return .001 * averageUVI * 25 * routeDistance / Constants.AVERAGE_WALKING_SPEED;
     }
     
+    // Converts irradiance (W/m2) to Joules based on duration of exposure and
+    // average exposed skin area
+    public static double irradianceToJoules(double irradiance, double time, double exposed_percent) {
+        return irradiance * time * Constants.AVERAGE_HUMAN_SURFACE_AREA * exposed_percent;
+    }
+    
+    public static double irradianceToJoules(double irradiance, double time) {
+        return irradiance * time * Constants.AVERAGE_HUMAN_SURFACE_AREA * Constants.DEFAULT_EXPOSED_SKIN_PERCENT;
+    }
+    
     public static double getError(double actual, double result) {
         return Math.abs(actual - result) / actual;
     }
