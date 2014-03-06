@@ -11,27 +11,37 @@ package navigation.shared;
  * @author tsepuiwah
  */
 public class Person {
-    private String skinType;
+    private int skinType;
     private int SPF;
+    private int bodyExposure; //as a percentage
     
-    public Person(String skinType, int SPF) {
+    public Person(int skinType, int SPF, int bodyExposure) {
         this.skinType = skinType;
         this.SPF = SPF;
+        this.bodyExposure = bodyExposure;
     }
     
-    public String getSkinType() {
+    public int getSkinType() {
         return this.skinType;
     }
 
     public int getSPF() {
         return this.SPF;
     }
+    
+    public int getBodyExposure() {
+        return this.bodyExposure;
+    }
 
-    public void changeSkinType(String skinType) {
+    public void changeSkinType(int skinType) {
         this.skinType = skinType;
     }
 
     public void changeSPF(int SPF) {
         this.SPF = SPF;
+    }
+    
+    public void changeBodyExposure(int bodyExposure) {
+        this.bodyExposure = bodyExposure;
     }
 }

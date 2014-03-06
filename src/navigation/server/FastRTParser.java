@@ -63,8 +63,11 @@ public class FastRTParser {
         String latitude = String.valueOf(latitude_double);
         String longitude = String.valueOf(longitude_double);
         
-        String skinType = person.getSkinType();
+        int skinType_int = person.getSkinType();
         int SPF = person.getSPF();
+        int bodyExposure_int = person.getBodyExposure();
+        String skinType = String.valueOf(skinType_int);
+        String bodyExposure = String.valueOf(bodyExposure_int);
         
         // POST key, value pairs
         List<NameValuePair> qparams = new ArrayList<NameValuePair>();
@@ -78,19 +81,19 @@ public class FastRTParser {
         //qparams.add(new BasicNameValuePair("start_time", "10.5"));
         //qparams.add(new BasicNameValuePair("body_exposure", "25"));
         */
-        qparams.add(new BasicNameValuePair("month", "31"));
-        qparams.add(new BasicNameValuePair("mday", "26"));
+        qparams.add(new BasicNameValuePair("month", month));
+        qparams.add(new BasicNameValuePair("mday", day));
         qparams.add(new BasicNameValuePair("latitude", latitude));
         qparams.add(new BasicNameValuePair("longitude", longitude));
+        // sza_angle never used if we want Date, Time, Location used
         qparams.add(new BasicNameValuePair("sza_angle", "60"));
-        // TODO: what are skin type options? how does it correspond to 1-6 scale?
-        qparams.add(new BasicNameValuePair("skin_index", "5"));
-        //assumes "1" selects 'Start time', instead of 'Around midday'
+        // uses Fitzpatrick scale, range: 0-5 for Types I-VI
+        qparams.add(new BasicNameValuePair("skin_index", skinType));
+        // "1" selects 'Start time', instead of 'Around midday'
         qparams.add(new BasicNameValuePair("exposure_timing", "1"));
         // TODO: what is format/data type of time? (add to parameters)
         qparams.add(new BasicNameValuePair("start_time", "10.5"));
-        // TODO: change body_exposure when SPF is different?
-        qparams.add(new BasicNameValuePair("body_exposure", "25"));
+        qparams.add(new BasicNameValuePair("body_exposure", bodyExposure));
         qparams.add(new BasicNameValuePair("dietary_equivalent", "1000"));
         qparams.add(new BasicNameValuePair("sky_condition", "0"));
         qparams.add(new BasicNameValuePair("aerosol_specification", "0"));
@@ -113,7 +116,8 @@ public class FastRTParser {
         CloseableHttpResponse response = httpclient.execute(httppost);
 
         String responseString = "";
-        String exposureTime = "";
+        String vitaminDExposureTime = "";
+        String sunburnExposureTime = "";
         
         try {
             HttpEntity entity = response.getEntity();
@@ -138,19 +142,18 @@ public class FastRTParser {
 
             Document doc = Jsoup.parse(responseString);
             Elements content = doc.getElementsContainingOwnText("Exposure time (hours:minutes)");
-            Element actual = content.first();
 
-            // Resides on the last node of the <p> subtree, which is not an element.
             // Request returns in hours:minutes format.
-            //System.out.println(content.last().childNode(content.last().childNodeSize() - 1));
-            exposureTime = content.first().nextElementSibling().nextSibling().toString();
-            System.out.println(exposureTime);
+            vitaminDExposureTime = content.first().nextElementSibling().nextSibling().toString();
+            //System.out.println(vitaminDExposureTime);
+            sunburnExposureTime = content.last().nextElementSibling().nextSibling().toString();
+            //System.out.println(sunburnExposureTime);
             EntityUtils.consume(entity);
         } finally {
             response.close();
         }
         
-        return exposureTime;
+        return vitaminDExposureTime+","+sunburnExposureTime;
     }
 
 }
