@@ -65,7 +65,7 @@ public class FastRTParser {
         
         int skinType_int = person.getSkinType();
         int SPF = person.getSPF();
-        int bodyExposure_int = person.getBodyExposure();
+        double bodyExposure_int = person.getBodyExposure();
         String skinType = String.valueOf(skinType_int);
         String bodyExposure = String.valueOf(bodyExposure_int);
         
@@ -141,13 +141,27 @@ public class FastRTParser {
             }
 
             Document doc = Jsoup.parse(responseString);
-            Elements content = doc.getElementsContainingOwnText("Exposure time (hours:minutes)");
+            Elements contentVitD = doc.getElementsContainingOwnText("UV exposure in order to obtain the desired amount of vitamin D:");
+            Elements contentSunburn = doc.getElementsContainingOwnText("UV exposure in order to obtain a sunburn:");
 
-            // Request returns in hours:minutes format.
-            vitaminDExposureTime = content.first().nextElementSibling().nextSibling().toString();
-            //System.out.println(vitaminDExposureTime);
-            sunburnExposureTime = content.last().nextElementSibling().nextSibling().toString();
-            //System.out.println(sunburnExposureTime);
+            if (contentVitD.first().nextElementSibling().nextElementSibling().nextElementSibling().tagName().equals("blink")) {
+                vitaminDExposureTime = "NA";
+                System.out.println("NA-vitaminD");
+            } else {
+                // Request returns in hours:minutes format.
+                vitaminDExposureTime = contentVitD.first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().nextSibling().toString();
+                System.out.println(vitaminDExposureTime);
+            }
+            
+            if (contentSunburn.first().nextElementSibling().nextElementSibling().nextElementSibling().tagName().equals("blink")) {
+                sunburnExposureTime = "NA";
+                System.out.println("NA-sunburn");
+            } else {
+                // Request returns in hours:minutes format.
+                sunburnExposureTime = contentSunburn.first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().nextSibling().toString();
+                System.out.println(sunburnExposureTime);
+            }
+
             EntityUtils.consume(entity);
         } finally {
             response.close();
