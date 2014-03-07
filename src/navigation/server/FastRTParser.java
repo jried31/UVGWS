@@ -40,7 +40,7 @@ import org.jsoup.select.Elements;
  */
 public class FastRTParser {
 
-    // Parses http://zardoz.nilu.no/cgi-bin/olaeng/VitD_quartMEDandMED.cgi and
+    // Parses http://zardoz.nilu.no/cgi-bin/olaeng/VitD_quartMEDandMED_v2.cgi and
     // returns the minimum amount of time needed to be spent in the sun for
     // effective Vitamin D consumption.
     public String parse(LatLong location, Person person) throws URISyntaxException, ClientProtocolException, IOException {
