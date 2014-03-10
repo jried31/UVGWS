@@ -40,6 +40,11 @@ import parse.almonds.Parse;
 import parse.almonds.ParseObject;
 import parse.almonds.ParseQuery;
 import parse.almonds.table.ParseUVReading;
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FileNotFoundException;
 
 /**
  *
@@ -59,6 +64,8 @@ public class SunUtil {
     private String city = null;
     private String state = null;
     private String place = null;
+    private String uvi_data = null;
+    private Calendar time; 
     
     private final String interval = "10";
     private String referrerURI="http://aa.usno.navy.mil/data/docs/AltAz.php";
@@ -100,19 +107,81 @@ public class SunUtil {
     public double convertDegreeToRadian(double degree){
         return degree*(Math.PI/180);
     }
-    public SunUtil(LatLong location) throws ParseException, parse.almonds.ParseException{
+    public SunUtil(LatLong location) throws ParseException, parse.almonds.ParseException {
         this.location = location;
+        System.out.print("Init SunUtil");
         //Retrieve the Sun Angle data from Website
+        this.uvi_data = Constants.PATH + Constants.CURRENT_UVI;
+        this.time = new GregorianCalendar();
         getSunAngleData();
-        updateUVI();
+        try 
+        {
+            CSVReader reader = new CSVReader(new FileReader(this.uvi_data));
+            String [] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                // nextLine[] is an array of values from the line
+                
+                if (nextLine[0].equals("timestamp")) {
+                    if(this.time.getTimeInMillis() < (Long.parseLong(nextLine[1]) + Constants.THIRTY_MINUTES_IN_MILLIS)) {
+                        // if the UVI values were updated in the last 30 minutes we can extract these cached values;
+                        //System.out.println("Reading cached values");
+                        getCachedUVI(reader);
+                        return;
+                    }
+                    else {
+                        updateUVI(); // if we have not updated UVI value in the past 30 minutes, update now
+                        return;
+                    }
+                }
+            }
+        } catch (Exception e) //FileNotFoundException, IOException
+        {
+            e.printStackTrace(); //add exception catching logic
+        }
+        
         /*if(timer == null){
             timer = new Timer();
             //timer.scheduleAtFixedRate(this.uviTaskHandler, 1000, Constants.UVI_UPDATE_INTERVAL);
         }*/
     }
     
+    public void getCachedUVI(CSVReader reader) {
+        try {
+            String [] nextLine;
+            while ((nextLine = reader.readNext()) != null)
+            {
+                if (nextLine[0].equals("meanUVISun")) {
+                    this.meanUVISun = Double.parseDouble(nextLine[1]);
+                }
+                if (nextLine[0].equals("meanUVICloud")) {
+                    this.meanUVICloud = Double.parseDouble(nextLine[1]);
+                }
+                if (nextLine[0].equals("meanUVIShade")) {
+                    this.meanUVIShade = Double.parseDouble(nextLine[1]);
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace(); // add exception catching logic
+        }
+        return;
+    }
+    
     public void updateUVI() throws parse.almonds.ParseException{
         Parse.initialize();
+        CSVWriter writer = null;
+        //System.out.println("Updating UVI");
+        try {
+            writer = new CSVWriter(new FileWriter(this.uvi_data), ',', CSVWriter.NO_QUOTE_CHARACTER);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        String[] csv_values = new String[2]; //this will hold the csv values of each line we add
+        csv_values[0]="timestamp";
+        csv_values[1]=Long.toString(this.time.getTimeInMillis());
+        writer.writeNext(csv_values);
         
         ParseQuery phenomenaQueryObject = new ParseQuery(ParseUVReading.TABLE_UV_DATA);
         phenomenaQueryObject.orderByDescending(ParseUVReading.TIMESTAMP);
@@ -140,29 +209,45 @@ public class SunUtil {
             if(environment != null){
                 if (environment.equals(ParseUVReading.CLASS_LABEL_IN_SUN)) {
                     if (sunCount <= 1) {
-                        meanUVISun = uvi;
+                        this.meanUVISun = uvi;
                     } else {
-                        meanUVISun = (uvi + meanUVISun * (sunCount - 1)) / sunCount;
+                        this.meanUVISun = (uvi + this.meanUVISun * (sunCount - 1)) / sunCount;
                     }
                     sunCount++;
                 } else if (environment.equals(ParseUVReading.CLASS_LABEL_IN_CLOUD)) {
                     if (cloudCount <= 1) {
-                        meanUVICloud = uvi;
+                        this.meanUVICloud = uvi;
                     } else {
-                        meanUVICloud = (uvi + meanUVICloud * (cloudCount - 1)) / cloudCount;
+                        this.meanUVICloud = (uvi + this.meanUVICloud * (cloudCount - 1)) / cloudCount;
                     }
                     cloudCount++;
                 } else if (environment.equals(ParseUVReading.CLASS_LABEL_IN_SHADE)) {
                     if (shadeCount <= 1) {
-                        meanUVIShade = uvi;
+                        this.meanUVIShade = uvi;
                     } else {
-                        meanUVIShade = (uvi + meanUVIShade * (shadeCount - 1)) / shadeCount;
+                        this.meanUVIShade = (uvi + this.meanUVIShade * (shadeCount - 1)) / shadeCount;
                     }
                     shadeCount++;
                 }
             }
             //}
         }
+        //System.out.println(Double.toString(this.meanUVISun));
+        csv_values[0]="meanUVISun";
+        csv_values[1]=Double.toString(this.meanUVISun);
+        writer.writeNext(csv_values);
+        csv_values[0]="meanUVICloud";
+        csv_values[1]=Double.toString(this.meanUVICloud);
+        writer.writeNext(csv_values);
+        csv_values[0]="meanUVIShade";
+        csv_values[1]=Double.toString(this.meanUVIShade);
+        writer.writeNext(csv_values);
+        try {
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("Finished Updating UVI");
     }
     
     public void computeSunAngles() throws ParseException{

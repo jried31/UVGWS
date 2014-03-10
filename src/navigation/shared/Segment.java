@@ -26,8 +26,6 @@ public class Segment {
     private Calendar end_time;
     private LatLong start_location;
     private LatLong end_location;
-    private Calendar start_time;
-    private Calendar end_time;
     private double averageUvi = 0;
     private double measuredUVI = 0;
     private double effectiveUVI = 0;
@@ -325,7 +323,7 @@ public class Segment {
         try {
             if (this.isInShadow()) {
                 //eUVI = eUVI * Constants.SHADOW_DAMPING_FACTOR;
-                eUVI = 1.5; //place as constant
+                eUVI = Constants.SHADE_UVI;
             }
         }
         catch (Exception e) {

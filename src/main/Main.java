@@ -153,13 +153,13 @@ public class Main {
 
 	public static void main(String args[]) throws Exception
 	{
-            testSegment();
+            //testSegment();
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
             LatLong end_location = new LatLong(34.192399, -118.444362);//33.878467, -118.375152);//33.883924, -118.367711);//33.876370, -118.349886);//33.883924, -118.367711);//33.879524, -118.372789);//33.878467, -118.375152);//33.877822, -118.377025);
             
             SunUtil util = new SunUtil(start_location);
             
-            
+            /*
             Segment s1 = new Segment();
             s1.setStart_point(start_location);
             s1.setEnd_point(end_location);
@@ -238,6 +238,10 @@ public class Main {
             //Returns the times where there exists energy from the 290 wavelength
             Set<String> hoursForVitaminD = parser.getVitaminD();
             System.out.println(hoursForVitaminD);
+            
+            */
+            double testUVI = Util.irradianceToUVI(.000264);
+            System.out.println(testUVI);
             
             //Computes the UVI from the excel file
             //Map<String, Double> uvi = parser.getUVIndex();
