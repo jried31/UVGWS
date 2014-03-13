@@ -240,8 +240,8 @@ public class Main {
             System.out.println(hoursForVitaminD);
             
             */
-            double testUVI = Util.irradianceToUVI(.000264);
-            System.out.println(testUVI);
+            //double testUVI = Util.irradianceToUVI(.000264);
+            //System.out.println(testUVI);
             
             //Computes the UVI from the excel file
             //Map<String, Double> uvi = parser.getUVIndex();

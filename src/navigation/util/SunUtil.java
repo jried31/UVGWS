@@ -109,7 +109,7 @@ public class SunUtil {
     }
     public SunUtil(LatLong location) throws ParseException, parse.almonds.ParseException {
         this.location = location;
-        System.out.print("Init SunUtil");
+        System.out.println("Init SunUtil");
         //Retrieve the Sun Angle data from Website
         this.uvi_data = Constants.PATH + Constants.CURRENT_UVI;
         this.time = new GregorianCalendar();
@@ -118,9 +118,10 @@ public class SunUtil {
         {
             CSVReader reader = new CSVReader(new FileReader(this.uvi_data));
             String [] nextLine;
+            Boolean readLine = false;
             while ((nextLine = reader.readNext()) != null) {
                 // nextLine[] is an array of values from the line
-                
+                readLine = true;
                 if (nextLine[0].equals("timestamp")) {
                     if(this.time.getTimeInMillis() < (Long.parseLong(nextLine[1]) + Constants.THIRTY_MINUTES_IN_MILLIS)) {
                         // if the UVI values were updated in the last 30 minutes we can extract these cached values;
@@ -133,6 +134,14 @@ public class SunUtil {
                         return;
                     }
                 }
+                else {
+                    updateUVI();
+                    return;
+                }
+            }
+            if(!readLine) {
+                updateUVI();
+                return;
             }
         } catch (Exception e) //FileNotFoundException, IOException
         {
@@ -167,6 +176,33 @@ public class SunUtil {
         return;
     }
     
+    public double findEnvironmentUVI (ParseQuery qObject, final String environment) throws parse.almonds.ParseException {
+        qObject.whereEqualTo(ParseUVReading.ENVIRONMENT, environment);
+	qObject.setLimit(30);
+        List<ParseObject> uvDataList = qObject.find();
+                    
+        long time1, time2;
+        Date now = new Date();
+        time1 = now.getTime();
+        int count=0;
+        double uvi=0;
+        
+        for (int i = 0; i < uvDataList.size();i++){
+            ParseObject uv = uvDataList.get(i);
+            Date timestamp = uv.getDate(ParseUVReading.TIMESTAMP);
+            uvi += (double) uv.getInt(ParseUVReading.UVI);
+            count ++;
+            //time2 = timestamp.getTime();
+            //if (time1 - time2 <= 120000) {
+            
+            //}
+        }
+        if(count == 0) {
+            return 0;
+        }
+        return uvi/count;
+    }
+    
     public void updateUVI() throws parse.almonds.ParseException{
         Parse.initialize();
         CSVWriter writer = null;
@@ -185,6 +221,10 @@ public class SunUtil {
         
         ParseQuery phenomenaQueryObject = new ParseQuery(ParseUVReading.TABLE_UV_DATA);
         phenomenaQueryObject.orderByDescending(ParseUVReading.TIMESTAMP);
+        this.meanUVISun = findEnvironmentUVI(phenomenaQueryObject, ParseUVReading.CLASS_LABEL_IN_SUN);
+        this.meanUVICloud = findEnvironmentUVI(phenomenaQueryObject, ParseUVReading.CLASS_LABEL_IN_CLOUD);
+        this.meanUVIShade = findEnvironmentUVI(phenomenaQueryObject, ParseUVReading.CLASS_LABEL_IN_SHADE);
+        /*
         phenomenaQueryObject.whereEqualTo(ParseUVReading.ENVIRONMENT, ParseUVReading.CLASS_LABEL_IN_SUN);
         phenomenaQueryObject.whereEqualTo(ParseUVReading.ENVIRONMENT, ParseUVReading.CLASS_LABEL_IN_CLOUD);
         phenomenaQueryObject.whereEqualTo(ParseUVReading.ENVIRONMENT, ParseUVReading.CLASS_LABEL_IN_SHADE);
@@ -203,8 +243,8 @@ public class SunUtil {
             Date timestamp = uv.getDate(ParseUVReading.TIMESTAMP);
             String environment = uv.getString(ParseUVReading.ENVIRONMENT);
             int uvi = uv.getInt(ParseUVReading.UVI);
+            System.out.println(environment + ": " + uvi);
             //time2 = timestamp.getTime();
-
             //if (time1 - time2 <= 120000) {
             if(environment != null){
                 if (environment.equals(ParseUVReading.CLASS_LABEL_IN_SUN)) {
@@ -232,7 +272,7 @@ public class SunUtil {
             }
             //}
         }
-        //System.out.println(Double.toString(this.meanUVISun));
+          */
         csv_values[0]="meanUVISun";
         csv_values[1]=Double.toString(this.meanUVISun);
         writer.writeNext(csv_values);
@@ -349,7 +389,7 @@ public class SunUtil {
             nameValuePairs.add(new BasicNameValuePair("xxm", month));//month
             
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            System.out.println(httppost.getURI().toString());
+            //System.out.println(httppost.getURI().toString());
             
             HttpResponse response = httpclient.execute(httppost);
             StatusLine statusLine = response.getStatusLine();
