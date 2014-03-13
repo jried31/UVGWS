@@ -43,19 +43,20 @@ public class FastRTParser {
     // Parses http://zardoz.nilu.no/cgi-bin/olaeng/VitD_quartMEDandMED_v2.cgi and
     // returns the minimum amount of time needed to be spent in the sun for
     // effective Vitamin D consumption.
-    public String parse(LatLong location, Person person) throws URISyntaxException, ClientProtocolException, IOException {
+    public String[] parse(LatLong location, Person person, int month_number, int day_number, int hour_number) throws URISyntaxException, ClientProtocolException, IOException {
         String website = "http://zardoz.nilu.no/cgi-bin/olaeng/VitD_quartMEDandMED_v2.cgi";
         
         // uses current date for month and day inputs
         // TODO: change to date of activity once we decide on data format
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
+        //Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"));
         //note: zero-based, Jan == 0
-        int month_number = cal.get(Calendar.MONTH); //actual month number minus 1
-        int day_number = cal.get(Calendar.DAY_OF_MONTH);
+        //int month_number = cal.get(Calendar.MONTH); //actual month number minus 1
+        //int day_number = cal.get(Calendar.DAY_OF_MONTH);
         int[] month_days = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
         int month_day = month_days[month_number];
         String month = String.valueOf(month_day);
         String day = String.valueOf(day_number);
+        String hour = String.valueOf(hour_number);
         
         // gets latitude and longitude of requested location
         double latitude_double = location.getLatitude();
@@ -92,7 +93,7 @@ public class FastRTParser {
         // "1" selects 'Start time', instead of 'Around midday'
         qparams.add(new BasicNameValuePair("exposure_timing", "1"));
         // TODO: what is format/data type of time? (add to parameters)
-        qparams.add(new BasicNameValuePair("start_time", "10.5"));
+        qparams.add(new BasicNameValuePair("start_time", hour));
         qparams.add(new BasicNameValuePair("body_exposure", bodyExposure));
         qparams.add(new BasicNameValuePair("dietary_equivalent", "1000"));
         qparams.add(new BasicNameValuePair("sky_condition", "0"));
@@ -167,7 +168,11 @@ public class FastRTParser {
             response.close();
         }
         
-        return vitaminDExposureTime+","+sunburnExposureTime;
+        String times[] = new String[2];
+        times[0] = vitaminDExposureTime;
+        times[1] = sunburnExposureTime;
+        
+        return times;
     }
 
 }
