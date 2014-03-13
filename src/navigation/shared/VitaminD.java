@@ -7,6 +7,9 @@
 package navigation.shared;
 
 import java.io.IOException;
+import java.lang.String;
+import java.lang.Integer;
+import java.lang.Double;
 import java.net.URISyntaxException;
 import java.util.Calendar;
 
@@ -28,13 +31,24 @@ public class VitaminD {
         sunburnTime = "";
     }
     
-    public String[] getVitaminDandSunburnTime(LatLong start_location, Person person, Calendar calendar) throws URISyntaxException, IOException {
+    public String[] getVitaminDandSunburnTime(LatLong start_location, Person person, String dateTime) throws URISyntaxException, IOException {
         
+        String month_text = dateTime.substring(5,7);
+        String day_text = dateTime.substring(8,10);
+        String hour_text = dateTime.substring(11, 13);
+        String minute_text = dateTime.substring(14);
         
+        //creates a double value out of hour and minute values
+        double hour = Double.parseDouble(hour_text);
+        double minute = Double.parseDouble(minute_text);
         
-        int month = calendar.MONTH;
-        int day = calendar.DAY_OF_MONTH;
-        int hour = calendar.HOUR_OF_DAY;
+        minute = minute/60;
+        
+        hour += minute;
+        
+        //gets int from month and day
+        int month = Integer.parseInt(month_text);
+        int day = Integer.parseInt(day_text);
         
         FastRTParser parser = new FastRTParser();
         

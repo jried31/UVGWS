@@ -43,7 +43,7 @@ public class FastRTParser {
     // Parses http://zardoz.nilu.no/cgi-bin/olaeng/VitD_quartMEDandMED_v2.cgi and
     // returns the minimum amount of time needed to be spent in the sun for
     // effective Vitamin D consumption.
-    public String[] parse(LatLong location, Person person, int month_number, int day_number, int hour_number) throws URISyntaxException, ClientProtocolException, IOException {
+    public String[] parse(LatLong location, Person person, int month_number, int day_number, double hour_number) throws URISyntaxException, ClientProtocolException, IOException {
         String website = "http://zardoz.nilu.no/cgi-bin/olaeng/VitD_quartMEDandMED_v2.cgi";
         
         // uses current date for month and day inputs

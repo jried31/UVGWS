@@ -11,21 +11,6 @@ package navigation.shared;
  * @author tsepuiwah
  */
 public class Person {
-    //body exposure array positions
-    private static final int BASEBALL_CAP = 0;
-    private static final int SUNGLASS = 1;
-    
-    private static final int SPORTS_BRA = 2;
-    private static final int TANK = 3;
-    private static final int SHORT_SLEEVES = 4;
-    private static final int LONG_SLEEVES = 5;
-    
-    private static final int SHORTS = 6;
-    private static final int MEDIUM_PANTS = 7;
-    private static final int LONG_PANTS = 8;
-    private static final int NONE = 9;
-    
-    private double[] bodyCoverage = {1.5, 1, 13, 26, 30, 40, 18, 25, 32, 0};
     
     private int skinType;
     private int SPF;
@@ -56,42 +41,42 @@ public class Person {
         return this.bodyExposure;
     }
 
-    public void changeSkinType(int skinType) {
+    public void setSkinType(int skinType) {
         this.skinType = skinType;
     }
 
-    public void changeSPF(int SPF) {
+    public void setSPF(int SPF) {
         this.SPF = SPF;
     }
     
-    public void changeBodyExposure(double bodyExposure) {
+    public void setBodyExposure(double bodyExposure) {
         this.bodyExposure = bodyExposure;
     }
     
     public void clothesToBodyExposure(String head, String upper, String lower) {
         double total = 0;
         //head
-        if (head.equals("BASEBALL_CAP")) {
+        if (head.equals("HAT")) {
             total += 1.5;
-        } else if (head.equals("SUNGLASS")) {
-            total += 1;
-        }
+        } //else if (head.equals("SUNGLASS")) {
+            //total += 1;
+        //}
         //upper
-        if (upper.equals("SPORTS_BRA")) {
+        if (upper.equals("SLEEVES-SPORTSBRA")) {
             total += 13;
-        } else if (upper.equals("TANK")) {
+        } else if (upper.equals("SLEEVES-TANK")) {
             total += 26;
-        } else if (upper.equals("SHORT_SLEEVES")) {
+        } else if (upper.equals("SLEEVES-SHORT")) {
             total += 30;
-        } else if (upper.equals("LONG_SLEEVES")) {
+        } else if (upper.equals("SLEEVES-LONG")) {
             total += 40;
         }
         //lower
-        if (lower.equals("SHORTS")) {
+        if (lower.equals("PANTS-SHORTS")) {
             total += 18;
-        } else if (lower.equals("MEDIUM_PANTS")) {
+        } else if (lower.equals("PANTS-MEDIUM")) {
             total += 25;
-        } else if (lower.equals("LONG_PANTS")) {
+        } else if (lower.equals("PANTS-LONG")) {
             total += 32;
         }
         
