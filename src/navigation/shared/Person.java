@@ -16,6 +16,12 @@ public class Person {
     private int SPF;
     private double bodyExposure; //as a percentage, 0-100, 0 = fully covered, 100 = no coverage
     
+    public Person() {
+        this.skinType = 1;
+        this.SPF = 0;
+        this.bodyExposure = 25;
+    }
+    
     public Person(String skinType, String SPF, double bodyExposure) {
         
         this.skinType = Integer.parseInt(skinType.substring(5));
@@ -42,12 +48,12 @@ public class Person {
         return this.bodyExposure;
     }
 
-    public void setSkinType(int skinType) {
-        this.skinType = skinType;
+    public void setSkinType(String skinType) {
+        this.skinType = Integer.parseInt(skinType.substring(5));
     }
 
-    public void setSPF(int SPF) {
-        this.SPF = SPF;
+    public void setSPF(String SPF) {
+        this.SPF = Integer.parseInt(SPF);
     }
     
     public void setBodyExposure(double bodyExposure) {
