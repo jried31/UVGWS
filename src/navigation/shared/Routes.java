@@ -65,6 +65,19 @@ public class Routes {
         }
         return sum;
     }
+    
+    /**
+     * Sets all data and initializes the Route.
+     */
+    public void initialize(LatLong startLocation, LatLong endLocation, Calendar startTime, double pace) throws Exception {
+        String endpoint = "http://maps.googleapis.com/maps/api/directions/json";
+        String requestParameters = "sensor=false&mode=walking&alternatives=true&origin="+startLocation.getLatitude()+","+startLocation.getLongitude()+"&destination="+endLocation.getLatitude()+","+endLocation.getLongitude();
+        String googleMapsResult = HttpSender.sendGetRequest(endpoint, requestParameters);
+        setGoogleAPIJson(API_Parser.getRouteInformation(googleMapsResult, 0));
+        setStart_time(startTime);
+        setPace(pace);
+        initialize();
+    }
 
     /**
      *

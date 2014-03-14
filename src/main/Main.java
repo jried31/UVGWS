@@ -196,13 +196,16 @@ public class Main {
             // initializing all routes
             for(int i = 0; i < 1; i++)
             {	
+                /*
                 allRoutes[i] = new Routes();
                 allRoutes[i].setGoogleAPIJson(API_Parser.getRouteInformation(googleMapsResult, i));
                 allRoutes[i].setStart_time(new GregorianCalendar(2014, 3, 6, 16, 0, 0));
                 allRoutes[i].setPace(5);
                 allRoutes[i].initialize();
+                */
                 
-                Routes r = allRoutes[i];
+                Routes r = new Routes();
+                r.initialize(source, destination, new GregorianCalendar(2014, 3, 6, 11, 0, 0), 5.0);
                 System.out.println("\n=============================\n");
                 System.out.println("Start Location:" + r.getStart_location());
                 System.out.println("End Location: " + r.getEnd_location());
@@ -218,6 +221,7 @@ public class Main {
                 System.out.println("Pace: " + r.getPace());
                 System.out.println("Summary: " + r.getSummary());
                 System.out.println("\n=============================\n");
+                System.exit(0);
 
                 allRoutesJSON.put(i,allRoutes[i].getJson());
             }
