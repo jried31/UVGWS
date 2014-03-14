@@ -31,6 +31,14 @@ public class VitaminD {
         sunburnTime = "";
     }
     
+    public String getVitaminDTime() {
+        return vitaminDTime;
+    }
+    
+    public String getSunburnTime() {
+        return sunburnTime;
+    }
+    
     public String[] getVitaminDandSunburnTime(LatLong start_location, Person person, String dateTime) throws URISyntaxException, IOException {
         
         String month_text = dateTime.substring(5,7);
@@ -53,6 +61,9 @@ public class VitaminD {
         FastRTParser parser = new FastRTParser();
         
         String times[] = parser.parse(start_location, person, month, day, hour);
+        
+        vitaminDTime = times[0];
+        sunburnTime = times[1];
         
         return times;
     }
