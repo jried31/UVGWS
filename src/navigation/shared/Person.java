@@ -24,9 +24,9 @@ public class Person {
     }
     
     // give default value for bodyExposure if not calculated yet
-    public Person(int skinType, int SPF) {
-        this.skinType = skinType;
-        this.SPF = SPF;
+    public Person(String skinType, String SPF) {
+        this.skinType = Integer.parseInt(skinType.substring(5));
+        this.SPF = Integer.parseInt(SPF);
         this.bodyExposure = 25;
     }
     

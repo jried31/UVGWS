@@ -23,8 +23,12 @@ public class TestMain {
     public static void main(String[] args) throws URISyntaxException, IOException {
         LatLong start_location = new LatLong(50.5, 4.2);
         
-        Person person = new Person(4,0);
-        Person person2 = new Person(4,0,50); //(int skinType, int SPF, double bodyExposure)
+        Person person = new Person("SKIN-4","0");
+        Person person2 = new Person("SKIN-3","0",50); //(int skinType, int SPF, double bodyExposure)
+        
+        System.out.println("Person 1 Skin type: " + person.getSkinType());
+        System.out.println("Person 1 SPF: " + person.getSPF());
+        System.out.println("Person 2 Skin Type: " + person2.getSkinType());
 
         person.clothesToBodyExposure("NONE", "SLEEVES-TANK", "PANTS-SHORTS"); //(hat, upper, lower)
         
