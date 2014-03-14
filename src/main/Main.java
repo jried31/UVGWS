@@ -17,6 +17,7 @@ import navigation.shared.Building;
 import navigation.util.Constants;
 import navigation.shared.LatLong;
 import navigation.shared.Segment;
+import navigation.shared.Person;
 import navigation.util.SunUtil;
 import navigation.util.Util;
 import org.geotools.data.FeatureSource;
@@ -157,6 +158,7 @@ public class Main {
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
             LatLong end_location = new LatLong(34.192399, -118.444362);//33.878467, -118.375152);//33.883924, -118.367711);//33.876370, -118.349886);//33.883924, -118.367711);//33.879524, -118.372789);//33.878467, -118.375152);//33.877822, -118.377025);
             
+            /*
             SunUtil util = new SunUtil(start_location);
             
             /*
@@ -167,7 +169,7 @@ public class Main {
             s1.isInShadow();
             
             if(true)return;
-            
+            */
             
             BoundingBox bb = new BoundingBox (start_location, end_location,80,120);
             Coordinate[] polygonCoord = bb.getBoundingBox();
@@ -226,7 +228,23 @@ public class Main {
 
             list = area.sortByDistance(list, start_location);
             
+            /*
+            //test RTParser
+            Person person = new Person(5,20,25);
+            LatLong current_location = new LatLong(34.191046, -118.444362);
+            //TODO: convert time to UTC and pass in to RTParser for month,day,start_time
             
+            //pass in user input to RTParser
+            System.out.println("Exposure Times");
+            FastRTParser rtparser = new FastRTParser();
+            String exposureTime = rtparser.parse(current_location, person);
+            //vitamin D and sunburn times are separated by a comma
+            String [] recommendedTimes = exposureTime.split("[,]");
+            System.out.print("Vitamin D:");
+            System.out.println(recommendedTimes[0]);
+            System.out.print("Sunburn:");
+            System.out.println(recommendedTimes[1]);
+            */
             
             if(true)return;
             
