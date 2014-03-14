@@ -13,6 +13,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.util.Calendar;
 
 /**
  * @author Jerrid This class is used to intialize the route information from a
@@ -27,6 +28,8 @@ public class Routes {
     private int duration;
     private LatLong start_location;
     private LatLong end_location;
+    private Calendar start_time;
+    private double pace = 1; // in m/s
     private double uva;
     private double uvb;
     private double uvi;
@@ -65,11 +68,19 @@ public class Routes {
         //initialize step information
         steps = new Step[legs.getAsJsonArray("steps").size()];
 
+        double durationTraveled = 0; // in sec
+        Calendar stepStartTime = (Calendar) start_time.clone();
         for (int i = 0; i < steps.length; i++) {
+            stepStartTime.add(Calendar.MILLISECOND, (int) (durationTraveled * 1000));
+                        
             steps[i] = new Step();
             steps[i].setGoogleAPIJson(API_Parser.getStepInformation(googleAPIJson, i));
+            steps[i].setStart_time(stepStartTime);
+            steps[i].setPace(pace);
             // initializes the steps
             steps[i].initialize();
+            
+            durationTraveled += steps[i].getDistanceInMeters();
         }
 
         // after all the steps are initialized, this method is called to set the UV values
@@ -229,6 +240,14 @@ public class Routes {
     public void setDistance(int distance) {
         this.distance = distance;
     }
+    
+    public double getDistanceInMeters() {
+        double sum = 0.0;
+        for (Step s : steps) {
+            sum += s.getDistanceInMeters();
+        }
+        return sum;
+    }
 
     public int getDuration() {
         return duration;
@@ -252,6 +271,22 @@ public class Routes {
 
     public void setEnd_location(LatLong end_location) {
         this.end_location = end_location;
+    }
+    
+    public Calendar getStart_time() {
+        return start_time;
+    }
+    
+    public void setStart_time(Calendar time) {
+        start_time = (Calendar) time.clone();
+    }
+    
+    public double getPace() {
+        return pace;
+    }
+    
+    public void setPace(double pace) {
+        this.pace = pace;
     }
 
     public double getUva() {

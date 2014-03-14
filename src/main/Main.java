@@ -9,14 +9,18 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import navigation.server.API_Parser;
 import navigation.shared.BoundingBox;
 import navigation.server.FastRTParser;
+import navigation.server.HttpSender;
 import navigation.server.NSFParser;
 import navigation.util.BuildingUtils;
 import navigation.shared.Building;
 import navigation.util.Constants;
 import navigation.shared.LatLong;
+import navigation.shared.Routes;
 import navigation.shared.Segment;
+import navigation.shared.Person;
 import navigation.util.SunUtil;
 import navigation.util.Util;
 import org.geotools.data.FeatureSource;
@@ -26,6 +30,8 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
@@ -130,8 +136,12 @@ public class Main {
             // Test the segment at various times of day.
             for (int hour = 13; hour <= 18; hour++) {
                 Calendar startTime = new GregorianCalendar(2014, 3, 21, hour, 0, 0);
-                Calendar endTime = new GregorianCalendar(2014, 3, 21, hour, 1, 0);
-                s.initialize(segStart, segEnd, startTime, endTime);
+                s.setStart_point(segStart);
+                s.setEnd_point(segEnd);
+                s.setStart_time(startTime);
+                s.setPace(5.0);
+                s.initialize();
+                
                 System.out.println("VVVVVVVVVVVVVVVVVVVVVVVVV");
                 System.out.println("Time: " + startTime.get(Calendar.HOUR_OF_DAY));
                 System.out.println("Start Point: " + s.getStart_point());
@@ -150,13 +160,82 @@ public class Main {
             
             System.exit(0);
         }
+        
+        public static void testRoutes() throws Exception {
+            //weyburn to starbucks
+            //LatLong source = new LatLong(Double.parseDouble("34.0616"), Double.parseDouble("-118.449733333333"));
+            //LatLong destination = new LatLong(Double.parseDouble("34.0624333333333"), Double.parseDouble("-118.447266666667"));
+            
+            //starbucks to boelter
+            LatLong source = new LatLong(Double.parseDouble("34.0624333333333"), Double.parseDouble("-118.447266666667"));
+            LatLong destination = new LatLong(Double.parseDouble("34.0676833333333"), Double.parseDouble("-118.444916666667"));
+                
+            //Weyburn/Gayley to Strathmore/Gayley
+            //LatLong source = new LatLong(Double.parseDouble("34.0619166666667"), Double.parseDouble("-118.448"));
+            //LatLong destination = new LatLong(Double.parseDouble("34.0685333333333"), Double.parseDouble("-118.44885"));
+            
+            //Strathmore/Gayley to Strathmore/Westwood
+            //LatLong source = new LatLong(Double.parseDouble("34.0685333333333"), Double.parseDouble("-118.44885"));
+            //LatLong destination = new LatLong(Double.parseDouble("34.0688166666667"), Double.parseDouble("-118.445033333333"));
+            
+            String endpoint = "http://maps.googleapis.com/maps/api/directions/json";
+            String requestParameters = "sensor=false&mode=walking&alternatives=true&origin="+source.getLatitude()+","+source.getLongitude()+"&destination="+destination.getLatitude()+","+destination.getLongitude();
+            String googleMapsResult = HttpSender.sendGetRequest(endpoint, requestParameters);
+            
+            //System.out.println(googleMapsResult);
+            Routes[] allRoutes;
+
+            //Grab route alternatives
+            int numberOfRoutes = API_Parser.getNumberOfRoutes(googleMapsResult);
+            allRoutes = new Routes[numberOfRoutes];
+
+            //Holds the JSON Google Maps route information to be returned to the calling function
+            JSONArray allRoutesJSON =  new JSONArray();
+
+
+            // initializing all routes
+            for(int i = 0; i < 1; i++)
+            {	
+                allRoutes[i] = new Routes();
+                allRoutes[i].setGoogleAPIJson(API_Parser.getRouteInformation(googleMapsResult, i));
+                allRoutes[i].setStart_time(new GregorianCalendar(2014, 3, 6, 16, 0, 0));
+                allRoutes[i].setPace(5);
+                allRoutes[i].initialize();
+                
+                Routes r = allRoutes[i];
+                System.out.println("\n=============================\n");
+                System.out.println("Start Location:" + r.getStart_location());
+                System.out.println("End Location: " + r.getEnd_location());
+                System.out.println("Distance: " + r.getDistance());
+                System.out.println("Distance in meters: " + r.getDistanceInMeters());
+                System.out.println("Start Time: " + r.getStart_time().get(Calendar.HOUR_OF_DAY));
+                System.out.println("No. segments in shadow: " + r.getNumTimesInShadow());
+                System.out.println("No. segments in sun: " + r.getNumTimesInSun());
+                System.out.println("Distance in shadow: " + r.getDistanceInShadow());
+                System.out.println("Distance in sun: " + r.getDistanceInSun());
+                System.out.println("Pace: " + r.getPace());
+                System.out.println("Summary: " + r.getSummary());
+                System.out.println("\n=============================\n");
+
+                allRoutesJSON.put(i,allRoutes[i].getJson());
+            }
+
+            JSONObject obj = new JSONObject();
+            obj.put("routes", allRoutesJSON);
+            System.out.println(obj.toString());
+            
+            System.exit(0);
+        }
 
 	public static void main(String args[]) throws Exception
 	{
             testSegment();
+            //testSegment();
+            testRoutes();
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
             LatLong end_location = new LatLong(34.192399, -118.444362);//33.878467, -118.375152);//33.883924, -118.367711);//33.876370, -118.349886);//33.883924, -118.367711);//33.879524, -118.372789);//33.878467, -118.375152);//33.877822, -118.377025);
             
+            /*
             SunUtil util = new SunUtil(start_location);
             
             /*
@@ -167,7 +246,7 @@ public class Main {
             s1.isInShadow();
             
             if(true)return;
-            
+            */
             
             BoundingBox bb = new BoundingBox (start_location, end_location,80,120);
             Coordinate[] polygonCoord = bb.getBoundingBox();
@@ -226,7 +305,23 @@ public class Main {
 
             list = area.sortByDistance(list, start_location);
             
+            /*
+            //test RTParser
+            Person person = new Person(5,20,25);
+            LatLong current_location = new LatLong(34.191046, -118.444362);
+            //TODO: convert time to UTC and pass in to RTParser for month,day,start_time
             
+            //pass in user input to RTParser
+            System.out.println("Exposure Times");
+            FastRTParser rtparser = new FastRTParser();
+            String exposureTime = rtparser.parse(current_location, person);
+            //vitamin D and sunburn times are separated by a comma
+            String [] recommendedTimes = exposureTime.split("[,]");
+            System.out.print("Vitamin D:");
+            System.out.println(recommendedTimes[0]);
+            System.out.print("Sunburn:");
+            System.out.println(recommendedTimes[1]);
+            */
             
             if(true)return;
             
@@ -239,7 +334,7 @@ public class Main {
             Set<String> hoursForVitaminD = parser.getVitaminD();
             System.out.println(hoursForVitaminD);
             
-            */
+            
             //double testUVI = Util.irradianceToUVI(.000264);
             //System.out.println(testUVI);
             

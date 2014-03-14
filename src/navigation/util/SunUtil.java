@@ -74,6 +74,7 @@ public class SunUtil {
     private String url ="http://aa.usno.navy.mil/cgi-bin/aa_altazw.pl?FFX=1&obj=INTERVAL&xxy=2014&xxm=2&xxd=25&xxi=10&st=CA&place=los+angeles&ZZZ=END";
             
     private Timer timer=null;
+    /*
     private TimerTask uviTaskHandler = new TimerTask(){
          public void run() {
              try {
@@ -83,7 +84,7 @@ public class SunUtil {
              }
             //timer.scheduleAtFixedRate(uviTaskHandler, 1000, Constants.UVI_UPDATE_INTERVAL);
         }
-    };
+    };*/
     public double getUVISun(){return meanUVISun;}
     public double getUVIShade(){return meanUVIShade;}
     public double getUVICloud(){return meanUVICloud;}
@@ -129,6 +130,12 @@ public class SunUtil {
     }
     
     public void UVInit() throws ParseException, parse.almonds.ParseException {
+        getSunAngleData();
+        try {
+            CSVReader reader = new CSVReader(new FileReader(this.uvi_data));
+        } catch (FileNotFoundException e) {
+            updateUVI();
+        }
         try 
         {
             CSVReader reader = new CSVReader(new FileReader(this.uvi_data));
