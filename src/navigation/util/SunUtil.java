@@ -130,7 +130,6 @@ public class SunUtil {
     }
     
     public void UVInit() throws ParseException, parse.almonds.ParseException {
-        getSunAngleData();
         try {
             CSVReader reader = new CSVReader(new FileReader(this.uvi_data));
         } catch (FileNotFoundException e) {

@@ -231,7 +231,7 @@ public class Main {
 	{
             testSegment();
             //testSegment();
-            testRoutes();
+            //testRoutes();
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
             LatLong end_location = new LatLong(34.192399, -118.444362);//33.878467, -118.375152);//33.883924, -118.367711);//33.876370, -118.349886);//33.883924, -118.367711);//33.879524, -118.372789);//33.878467, -118.375152);//33.877822, -118.377025);
             
@@ -247,7 +247,7 @@ public class Main {
             
             if(true)return;
             */
-            
+            /*
             BoundingBox bb = new BoundingBox (start_location, end_location,80,120);
             Coordinate[] polygonCoord = bb.getBoundingBox();
             
@@ -322,7 +322,7 @@ public class Main {
             System.out.print("Sunburn:");
             System.out.println(recommendedTimes[1]);
             */
-            
+            /*
             if(true)return;
             
             NSFParser parser = new NSFParser();
