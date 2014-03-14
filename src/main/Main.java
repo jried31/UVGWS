@@ -213,6 +213,8 @@ public class Main {
                 System.out.println("No. segments in sun: " + r.getNumTimesInSun());
                 System.out.println("Distance in shadow: " + r.getDistanceInShadow());
                 System.out.println("Distance in sun: " + r.getDistanceInSun());
+                System.out.println("Time in shadow: " + r.getDurationInShadow());
+                System.out.println("Time in sun: " + r.getDurationInSun());
                 System.out.println("Pace: " + r.getPace());
                 System.out.println("Summary: " + r.getSummary());
                 System.out.println("\n=============================\n");
@@ -229,9 +231,8 @@ public class Main {
 
 	public static void main(String args[]) throws Exception
 	{
-            testSegment();
             //testSegment();
-            //testRoutes();
+            testRoutes();
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
             LatLong end_location = new LatLong(34.192399, -118.444362);//33.878467, -118.375152);//33.883924, -118.367711);//33.876370, -118.349886);//33.883924, -118.367711);//33.879524, -118.372789);//33.878467, -118.375152);//33.877822, -118.377025);
             

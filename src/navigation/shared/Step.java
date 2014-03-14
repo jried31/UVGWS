@@ -45,6 +45,23 @@ public class Step {
     public double getDistanceInSun() {
         return distanceInSun;
     }
+    
+    // In seconds
+    public double getDurationInSun() {
+        double sum = 0.0;
+        for (Segment s : this.segments) {
+            sum += s.getDurationInSun();
+        }
+        return sum;
+    }
+    
+    public double getDurationInShadow() {
+        double sum = 0.0;
+        for (Segment s : this.segments) {
+            sum += s.getDurationInShadow();
+        }
+        return sum;
+    }
 
     /**
      * @throws Exception Used to initialize the Steps and also set the Steps

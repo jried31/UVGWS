@@ -47,6 +47,24 @@ public class Routes {
     public double getDistanceInSun() {
         return distanceInSun;
     }
+    
+    // In Seconds
+    public double getDurationInSun() {
+        double sum = 0.0;
+        for (Step s : this.steps) {
+            sum += s.getDurationInSun();
+        }
+        return sum;
+    }
+    
+    // In Seconds
+    public double getDurationInShadow() {
+        double sum = 0.0;
+        for (Step s : this.steps) {
+            sum += s.getDurationInShadow();
+        }
+        return sum;
+    }
 
     /**
      *
