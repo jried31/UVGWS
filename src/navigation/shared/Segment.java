@@ -23,7 +23,7 @@ import java.lang.IllegalArgumentException;
 public class Segment {
 
     private Calendar start_time;
-    private Calendar end_time;
+    private double pace = 1; // in m/s
     private LatLong start_location;
     private LatLong end_location;
     private double averageUvi = 0;
@@ -31,7 +31,7 @@ public class Segment {
     private double effectiveUVI = 0;
     private int no_of_readings = 0;
     private int numTimesInShadow=0, numTimesInSun=0;
-    private int durationInShadow, durationInSun; // in sec
+    private double durationInShadow, durationInSun; // in sec
     private double distanceInShadow, distanceInSun; //in km
     public static final double MAX_SEGMENT_SIZE = .005;//in km
     private int numSegmentSlices = 1; //a segment counts as a segment slice itself
@@ -51,19 +51,11 @@ public class Segment {
         }
     }
     
-    public void initialize(LatLong startPoint, LatLong endPoint, Calendar startTime, Calendar endTime) throws Exception {
-        setStart_point(startPoint);
-        setEnd_point(endPoint);
-        setStart_time(startTime);
-        setEnd_time(endTime);
-        initialize();
-    }
-    
-    public int getDurationInShadow() {
+    public double getDurationInShadow() {
         return durationInShadow;
     }
     
-    public int getDurationInSun() {
+    public double getDurationInSun() {
         return durationInSun;
     }
     
@@ -80,7 +72,7 @@ public class Segment {
         this.start_location = start_coords;
         this.end_location = end_coords;
         this.start_time = start_t;
-        this.end_time = end_t;
+        //this.end_time = end_t;
         this.measuredUVI = UVI;
     }
 
@@ -97,21 +89,20 @@ public class Segment {
     */
     private void split() throws SQLException,Exception {
             LatLong midPoint = getMidpoint();
-            int secondsDifference = timeDifferenceInSeconds(getStart_time(), getEnd_time());
             Calendar midTime = (Calendar) getStart_time().clone();
-            midTime.add(Calendar.SECOND, secondsDifference/2);
+            midTime.add(Calendar.MILLISECOND, (int) (getDuration() * 1000 / 2));
             
             Segment s1 = new Segment();
             s1.setStart_point(getStart_point());
             s1.setEnd_point(midPoint);
             s1.setStart_time(getStart_time());
-            s1.setEnd_time(midTime);
+            s1.setPace(pace);
             
             Segment s2 = new Segment();
             s2.setStart_point(midPoint);
             s2.setEnd_point(getEnd_point());
             s2.setStart_time(midTime);
-            s2.setEnd_time(getEnd_time());
+            s2.setPace(pace);
             
             s1.initialize();
             s2.initialize();
@@ -153,7 +144,7 @@ public class Segment {
      */
     public void getReadings() throws SQLException,Exception {   
         double segmentDistance = Util.getDistance(start_location, end_location);
-        int segmentDuration = timeDifferenceInSeconds(getStart_time(), getEnd_time());
+        double segmentDuration = getDuration();
         no_of_readings = 1;
         if (isInShadow()) {
             System.out.println("SEGMENT IN SHADOW");
@@ -250,13 +241,22 @@ public class Segment {
     public void setStart_time(Calendar time) {
         start_time = (Calendar) time.clone();
     }
-    
-    public Calendar getEnd_time() {
-        return end_time;
+
+    public double getPace() {
+        return pace;
     }
     
-    public void setEnd_time(Calendar time) {
-        end_time = (Calendar) time.clone();
+    public void setPace(double pace) {
+        this.pace = pace;
+    }
+    
+    /**
+     * @return Segment duration in seconds
+     */
+    public double getDuration() {
+        double distance = Util.getDistance(start_location, end_location);
+        // duration = distance (in meters) * pace (in seconds/meter)
+        return (distance * 1000) * (1/pace);
     }
 
     public LatLong getStart_point() {
@@ -302,20 +302,6 @@ public class Segment {
     public Calendar getStartTime() {
         return start_time;
     }
-
-    public void setEndTime(Calendar time) {
-        this.end_time = time;
-    }
-
-    public Calendar getEndTime() {
-        return end_time;
-    }
-    
-    //returns duration along segment
-    public double getSegmentDuration() {
-        return (end_time.getTimeInMillis() - start_time.getTimeInMillis()) * 1000;
-    }
-    
     
     public void calculateEffectiveUVI() 
     {
@@ -336,6 +322,6 @@ public class Segment {
     // returns the total UV exposure (in Joules) for this segment
     public double getEffectiveUVDose() {
         Util utils = new Util();
-        return utils.computeExposure(this.effectiveUVI, this.getSegmentDuration());
+        return utils.computeExposure(this.effectiveUVI, this.getDuration());
     }
 }
