@@ -147,20 +147,20 @@ public class FastRTParser {
 
             if (contentVitD.first().nextElementSibling().nextElementSibling().nextElementSibling().tagName().equals("blink")) {
                 vitaminDExposureTime = "NA";
-                System.out.println("NA-vitaminD");
+                //System.out.println("NA-vitaminD");
             } else {
                 // Request returns in hours:minutes format.
                 vitaminDExposureTime = contentVitD.first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().nextSibling().toString();
-                System.out.println(vitaminDExposureTime);
+                //System.out.println(vitaminDExposureTime);
             }
             
             if (contentSunburn.first().nextElementSibling().nextElementSibling().nextElementSibling().tagName().equals("blink")) {
                 sunburnExposureTime = "NA";
-                System.out.println("NA-sunburn");
+                //System.out.println("NA-sunburn");
             } else {
                 // Request returns in hours:minutes format.
                 sunburnExposureTime = contentSunburn.first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().nextSibling().toString();
-                System.out.println(sunburnExposureTime);
+                //System.out.println(sunburnExposureTime);
             }
 
             EntityUtils.consume(entity);
