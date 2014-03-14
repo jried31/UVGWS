@@ -19,6 +19,7 @@ public class Constants {
     public final static String UV_IRRADIANCE = "Data635109626095766954.csv";
     public final static String CIE = "CIE.txt";
     public final static String CURRENT_UVI = "current_uvi.csv";
+    public final static String CURRENT_ANGLES = "current_angles.csv";
 
     public final static int LATITUDE = 0;
     public final static int LONGITUDE = 1;

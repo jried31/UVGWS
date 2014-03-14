@@ -65,6 +65,8 @@ public class SunUtil {
     private String state = null;
     private String place = null;
     private String uvi_data = null;
+    private String angle_data = null;
+    private HashMap<String,SunAngle> sunAngles = null;
     private Calendar time; 
     
     private final String interval = "10";
@@ -72,6 +74,7 @@ public class SunUtil {
     private String url ="http://aa.usno.navy.mil/cgi-bin/aa_altazw.pl?FFX=1&obj=INTERVAL&xxy=2014&xxm=2&xxd=25&xxi=10&st=CA&place=los+angeles&ZZZ=END";
             
     private Timer timer=null;
+    /*
     private TimerTask uviTaskHandler = new TimerTask(){
          public void run() {
              try {
@@ -81,7 +84,7 @@ public class SunUtil {
              }
             //timer.scheduleAtFixedRate(uviTaskHandler, 1000, Constants.UVI_UPDATE_INTERVAL);
         }
-    };
+    };*/
     public double getUVISun(){return meanUVISun;}
     public double getUVIShade(){return meanUVIShade;}
     public double getUVICloud(){return meanUVICloud;}
@@ -112,8 +115,21 @@ public class SunUtil {
         System.out.println("Init SunUtil");
         //Retrieve the Sun Angle data from Website
         this.uvi_data = Constants.PATH + Constants.CURRENT_UVI;
+        this.angle_data = Constants.PATH + Constants.CURRENT_ANGLES;
         this.time = new GregorianCalendar();
-        getSunAngleData();
+        this.UVInit();
+        //this.AnglesInit();
+        System.out.println("Done Init");
+        //getSunAngleData();
+        
+        
+        /*if(timer == null){
+            timer = new Timer();
+            //timer.scheduleAtFixedRate(this.uviTaskHandler, 1000, Constants.UVI_UPDATE_INTERVAL);
+        }*/
+    }
+    
+    public void UVInit() throws ParseException, parse.almonds.ParseException {
         try {
             CSVReader reader = new CSVReader(new FileReader(this.uvi_data));
         } catch (FileNotFoundException e) {
@@ -126,7 +142,7 @@ public class SunUtil {
             Boolean readLine = false;
             while ((nextLine = reader.readNext()) != null) {
                 // nextLine[] is an array of values from the line
-                readLine = true;
+//                readLine = true;
                 if (nextLine[0].equals("timestamp")) {
                     if(this.time.getTimeInMillis() < (Long.parseLong(nextLine[1]) + Constants.THIRTY_MINUTES_IN_MILLIS)) {
                         // if the UVI values were updated in the last 30 minutes we can extract these cached values;
@@ -148,15 +164,59 @@ public class SunUtil {
                 updateUVI();
                 return;
             }
-        } catch (Exception e) //FileNotFoundException, IOException
+        } catch (FileNotFoundException e) //FileNotFoundException, IOException
         {
-            e.printStackTrace(); //add exception catching logic
+            //e.printStackTrace(); //add exception catching logic
+            updateUVI();
+            return;
         }
-        
-        /*if(timer == null){
-            timer = new Timer();
-            //timer.scheduleAtFixedRate(this.uviTaskHandler, 1000, Constants.UVI_UPDATE_INTERVAL);
-        }*/
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void AnglesInit() throws ParseException, parse.almonds.ParseException {
+        try 
+        {
+            System.out.println("Start Angles");
+            CSVReader angle_reader = new CSVReader(new FileReader(this.angle_data));
+            String [] nextLine;
+            Boolean readLine = false;
+            while ((nextLine = angle_reader.readNext()) != null) {
+                // nextLine[] is an array of values from the line
+//                readLine = true;
+                if (nextLine[0].equals("timestamp")) {
+                    if(this.time.getTimeInMillis() < (Long.parseLong(nextLine[1]) + Constants.THIRTY_MINUTES_IN_MILLIS)) {
+                        // if the UVI values were updated in the last 30 minutes we can extract these cached values;
+                        //System.out.println("Reading cached values");
+                        getCachedAngleData(angle_reader);
+                        return;
+                    }
+                    else {
+                        getSunAngleData();
+                        return;
+                    }
+                }
+                else {
+                    getSunAngleData();
+                    return;
+                }
+            }
+            if(!readLine) {
+                getSunAngleData();
+                return;
+            }
+        } catch (FileNotFoundException e) //FileNotFoundException, IOException
+        {
+            //e.printStackTrace(); //add exception catching logic
+            System.out.println("FNF");
+            getSunAngleData();
+            return;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("Done Angles");
     }
     
     public void getCachedUVI(CSVReader reader) {
@@ -295,22 +355,75 @@ public class SunUtil {
         System.out.println("Finished Updating UVI");
     }
     
+    public void getCachedAngleData(CSVReader reader) {
+        try {
+            String [] nextLine;
+            while ((nextLine = reader.readNext()) != null)
+            {
+                if (nextLine[0].equals("elevAngleSun")) {
+                    this.elevAngleSun = Double.parseDouble(nextLine[1]);
+                }
+                if (nextLine[0].equals("azimuthAngle")) {
+                    this.azimuthAngle = Double.parseDouble(nextLine[1]);
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace(); // add exception catching logic
+        }
+        return;
+    }
+    
     public void computeSunAngles() throws ParseException{
+        /* CSVWriter writer = null;
+        try {
+            writer = new CSVWriter(new FileWriter(this.uvi_data), ',', CSVWriter.NO_QUOTE_CHARACTER);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        String[] csv_values = new String[2]; //this will hold the csv values of each line we add
+        csv_values[0]="timestamp";
+        csv_values[1]=Long.toString(this.time.getTimeInMillis());
+        writer.writeNext(csv_values);*/
         updateCurrentTime();
         String time = ((hour.length()==1?"0"+hour:hour)+":"+(minute.length()==1?"00":(minute.charAt(0)+"0")));//"13:30";//
-        SunAngle angle = sunAngles.get(time);
+        SunAngle angle = this.sunAngles.get(time);
         if(angle != null){
-            azimuthAngle = angle.getAzimuth();
-            elevAngleSun = angle.getAltitude();
-            System.out.println("Azimuth Angle: "+azimuthAngle+ " Azimuth Cartesian: "+ this.getAzmuthAngleAsCartesian()+ " Elevation Angle: "+elevAngleSun);
-        }
+            this.azimuthAngle = angle.getAzimuth();
+            this.elevAngleSun = angle.getAltitude();
+            System.out.println("Azimuth Angle: "+this.azimuthAngle+ " Azimuth Cartesian: "+ this.getAzmuthAngleAsCartesian()+ " Elevation Angle: "+this.elevAngleSun);
+        }/*
+        csv_values[0]="elevAngleSun";
+        csv_values[1]=Double.toString(this.elevAngleSun);
+        writer.writeNext(csv_values);
+        csv_values[0]="azimuthAngle";
+        csv_values[1]=Double.toString(this.azimuthAngle);
+        writer.writeNext(csv_values);
+        try {
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
     }
     
     public void computeSunAngles(Calendar calendar,LatLong position){
         
         double latitude = position.getLatitude();
-        double longitude = position.getLongitude();
-        
+        double longitude = position.getLongitude();/*
+        CSVWriter writer = null;
+        try {
+            writer = new CSVWriter(new FileWriter(this.uvi_data), ',', CSVWriter.NO_QUOTE_CHARACTER);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        String[] csv_values = new String[2]; //this will hold the csv values of each line we add
+        csv_values[0]="timestamp";
+        csv_values[1]=Long.toString(this.time.getTimeInMillis());
+        writer.writeNext(csv_values);*/
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
         //double LT = getTimeInHours();
         //final int dayOfYear = 347; //hard coded day of year
@@ -327,25 +440,37 @@ public class SunUtil {
         final double HRA = Math.toRadians(15 * (LST - 12)); //hour angle, in radians
         final double delta = Math.toRadians(23.45 * Math.sin(B));//in radians
         //elevation angle of the sun
-        elevAngleSun = Math.asin((Math.sin(delta) * Math.sin(Math.toRadians(latitude)) + Math.cos(delta) * Math.cos(Math.toRadians(latitude)) * Math.cos(HRA)));//in radians
+        this.elevAngleSun = Math.asin((Math.sin(delta) * Math.sin(Math.toRadians(latitude)) + Math.cos(delta) * Math.cos(Math.toRadians(latitude)) * Math.cos(HRA)));//in radians
 
         System.out.println("LT (time): " + LT);
         
         //if the sun is not up
         //find out elevation angle for morning and night (what is the cutoff points)
-        if (elevAngleSun <= 0) {
+        if (this.elevAngleSun <= 0) {
             return;
         }
 
         //azimuth angle
         final double theta = Math.acos((Math.sin(delta) * Math.cos(Math.toRadians(latitude)) - Math.cos(delta) * Math.sin(Math.toRadians(latitude)) * Math.cos(HRA)) / Math.cos(elevAngleSun));//in radians
         if (LST > 12 || HRA > 0) {
-            azimuthAngle = 360 - Math.toDegrees(theta);
+            this.azimuthAngle = 360 - Math.toDegrees(theta);
         } else {
-            azimuthAngle = Math.toDegrees(theta);
+            this.azimuthAngle = Math.toDegrees(theta);
         }
         
         // need to convert az here for different quadrants
+        /*
+        csv_values[0]="elevAngleSun";
+        csv_values[1]=Double.toString(this.elevAngleSun);
+        writer.writeNext(csv_values);
+        csv_values[0]="azimuthAngle";
+        csv_values[1]=Double.toString(this.azimuthAngle);
+        writer.writeNext(csv_values);
+        try {
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
         System.out.println("Azimuth:  " + azimuthAngle + " az after conversion: " + this.getAzmuthAngleAsCartesian());
     }
     
@@ -369,11 +494,23 @@ public class SunUtil {
         
      private static final String TIME24HOURS_PATTERN = "([01]?[0-9]|2[0-3]):[0-5][0-9].*";
           
-    private HashMap<String,SunAngle> sunAngles;
+    //private HashMap<String,SunAngle> sunAngles;
     private void getSunAngleData() throws ParseException{
+        CSVWriter writer = null;
+        try {
+            writer = new CSVWriter(new FileWriter(this.uvi_data), ',', CSVWriter.NO_QUOTE_CHARACTER);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        String[] csv_values = new String[2]; //this will hold the csv values of each line we add
+        csv_values[0]="timestamp";
+        csv_values[1]=Long.toString(this.time.getTimeInMillis());
+        writer.writeNext(csv_values);
         getLocationInformation();
         updateCurrentTime();
-        
+        System.out.println("getting angle data");
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost(url);
         httppost.addHeader("Referer", referrerURI);
@@ -406,13 +543,13 @@ public class SunUtil {
                 responseString = out.toString();
                 
                 token = responseString.split("\n");
-                sunAngles = new HashMap<String,SunAngle>();
+                this.sunAngles = new HashMap<String,SunAngle>();
                 for (String row : token) {
                     boolean val = row.matches(TIME24HOURS_PATTERN);
                     if(val == true)
                     {
                         String data[] = row.split("\\s+");
-                        sunAngles.put(data[0],new SunAngle(data[0],Float.valueOf(data[1]),Float.valueOf(data[2])));
+                        this.sunAngles.put(data[0],new SunAngle(data[0],Float.valueOf(data[1]),Float.valueOf(data[2])));
                         //System.out.println(row + " " +val);
                     }
                 }
