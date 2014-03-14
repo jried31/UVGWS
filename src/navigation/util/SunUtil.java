@@ -114,6 +114,11 @@ public class SunUtil {
         this.uvi_data = Constants.PATH + Constants.CURRENT_UVI;
         this.time = new GregorianCalendar();
         getSunAngleData();
+        try {
+            CSVReader reader = new CSVReader(new FileReader(this.uvi_data));
+        } catch (FileNotFoundException e) {
+            updateUVI();
+        }
         try 
         {
             CSVReader reader = new CSVReader(new FileReader(this.uvi_data));

@@ -9,6 +9,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.util.Calendar;
+import navigation.util.Util;
 
 /**
  * @author Jerrid This class is the Steps within a route that correspond to
@@ -23,6 +25,8 @@ public class Step {
     private int duration;
     private LatLong start_location;
     private LatLong end_location;
+    private Calendar start_time;
+    private double pace = 1; // in m/s
     private double uva = 0;
     private double uvb = 0;
     private double uvi = 0;
@@ -87,7 +91,7 @@ public class Step {
 
     /**
      * @throws Exception Sets the end points for each segments and calls to
-     * initilize them
+     * initialize them
      */
     public void setSegments() throws Exception {
         String endpoint = "http://www.yournavigation.org/api/1.0/gosmore.php";
@@ -106,6 +110,7 @@ public class Step {
         LatLong p1;
         LatLong p2;
 
+        double durationTraveled = 0; // in sec.
         for (int i = 0; i < segments.length; i++) {
             segments[i] = new Segment();
             p1 = new LatLong();
@@ -123,13 +128,20 @@ public class Step {
             sp = two.trim().split(",");
             p2.setLatitude(Double.parseDouble(sp[1]));
             p2.setLongitude(Double.parseDouble(sp[0]));
-
+            
+            Calendar segStartTime = (Calendar) start_time.clone();
+            segStartTime.add(Calendar.MILLISECOND, (int) (durationTraveled * 1000));
+            
             segments[i].setStart_point(p1);
             segments[i].setEnd_point(p2);
+            segments[i].setStart_time(segStartTime);
+            segments[i].setPace(pace);
             one = "";
             two = "";
             // after the end points of the segments is set, it calls to initialize the segment
             segments[i].initialize();
+            
+            durationTraveled += segments[i].getDuration();
         }
 
     }
@@ -280,6 +292,17 @@ public class Step {
     public int getDistance() {
         return distance;
     }
+    
+    public double getDistanceInMeters() {
+        double sum = 0.0;
+        for (Segment s : segments) {
+            LatLong segStart = s.getStart_point();
+            LatLong segEnd = s.getEnd_point();
+            double distInKm = Util.getDistance(segStart, segEnd);
+            sum += distInKm * 1000;
+        }
+        return sum;
+    }
 
     public void setDistance(int distance) {
         this.distance = distance;
@@ -307,6 +330,22 @@ public class Step {
 
     public void setEnd_point(LatLong end_point) {
         this.end_location = end_point;
+    }
+    
+    public Calendar getStart_time() {
+        return start_time;
+    }
+    
+    public void setStart_time(Calendar time) {
+        this.start_time = (Calendar) time.clone();
+    }
+    
+    public double getPace() {
+        return pace;
+    }
+    
+    public void setPace(double pace) {
+        this.pace = pace;
     }
 
     public double getUva() {

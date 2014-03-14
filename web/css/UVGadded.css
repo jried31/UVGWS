@@ -1,0 +1,33 @@
+#directions-panel {
+    //overflow: auto;
+    //padding: 10px;
+    //margin: 20px 10px 20px 20px;
+    background-color: white;
+    //float: left;
+    //height: 50%;
+    //width: 57%;
+    //width: 390px; // put back in
+    //text-align:left;
+    //font-family: Arial;
+    //border: 6.5px solid;
+    //border-radius: 4px;
+    //display: none;
+    margin-top: 10px;
+}
+
+.inner2 {
+    background-color: white;
+}
+
+#map-canvas {
+            //position: initial;
+            //height: 100%;
+            //width: 100%;
+            //margin: 10px;
+            //padding: 0;
+            //font-size: 14px;
+            //font-family: Arial;
+            //border: 6.5px solid;
+            //border-radius:4px;
+            //float: left;
+        }
