@@ -206,6 +206,7 @@ public class Main {
                 System.out.println("Start Location:" + r.getStart_location());
                 System.out.println("End Location: " + r.getEnd_location());
                 System.out.println("Distance: " + r.getDistance());
+                System.out.println("Distance in meters: " + r.getDistanceInMeters());
                 System.out.println("Start Time: " + r.getStart_time().get(Calendar.HOUR_OF_DAY));
                 System.out.println("No. segments in shadow: " + r.getNumTimesInShadow());
                 System.out.println("No. segments in sun: " + r.getNumTimesInSun());
@@ -221,12 +222,13 @@ public class Main {
             JSONObject obj = new JSONObject();
             obj.put("routes", allRoutesJSON);
             System.out.println(obj.toString());
+            
+            System.exit(0);
         }
 
 	public static void main(String args[]) throws Exception
 	{
             testRoutes();
-            testSegment();
             LatLong start_location = new LatLong(34.191046, -118.444362);//33.878458, -118.376632);//33.884801, -118.368365);//33.875960, -118.351002);//33.884801, -118.368365);//33.880005, -118.372799);//33.878458, -118.376632);//33.879198, -118.376963);
             LatLong end_location = new LatLong(34.192399, -118.444362);//33.878467, -118.375152);//33.883924, -118.367711);//33.876370, -118.349886);//33.883924, -118.367711);//33.879524, -118.372789);//33.878467, -118.375152);//33.877822, -118.377025);
             

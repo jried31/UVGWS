@@ -240,6 +240,14 @@ public class Routes {
     public void setDistance(int distance) {
         this.distance = distance;
     }
+    
+    public double getDistanceInMeters() {
+        double sum = 0.0;
+        for (Step s : steps) {
+            sum += s.getDistanceInMeters();
+        }
+        return sum;
+    }
 
     public int getDuration() {
         return duration;
