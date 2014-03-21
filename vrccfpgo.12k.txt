@@ -1,0 +1,116 @@
+﻿Revert "Added Web Project"
+
+This reverts commit 6e40444a03991227f73ab4af2f4c548b88c3e606.
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch interface
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	deleted:    UVG_Web/build.xml
+#	deleted:    UVG_Web/nbproject/ant-deploy.xml
+#	deleted:    UVG_Web/nbproject/build-impl.xml
+#	deleted:    UVG_Web/nbproject/build-impl.xml~
+#	deleted:    UVG_Web/nbproject/genfiles.properties
+#	deleted:    UVG_Web/nbproject/jax-ws.xml
+#	deleted:    UVG_Web/nbproject/jaxws-build.xml
+#	deleted:    UVG_Web/nbproject/private/private.properties
+#	deleted:    UVG_Web/nbproject/private/private.xml
+#	deleted:    UVG_Web/nbproject/project.properties
+#	deleted:    UVG_Web/nbproject/project.xml
+#	deleted:    UVG_Web/nbproject/rest-build.xml
+#	deleted:    UVG_Web/src/conf/MANIFEST.MF
+#	deleted:    UVG_Web/src/java/uvgWeb/ApplicationConfig.java
+#	deleted:    UVG_Web/src/java/uvgWeb/UVGWebHomepage.java
+#	deleted:    UVG_Web/web/WEB-INF/LIB/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar
+#	deleted:    UVG_Web/web/WEB-INF/LIB/javaee-endorsed-api-6.0/javaee-doc-api.jar
+#	deleted:    UVG_Web/web/WEB-INF/LIB/javaee-endorsed-api-6.0/javax.annotation.jar
+#	deleted:    UVG_Web/web/WEB-INF/LIB/javaee-endorsed-api-6.0/jaxb-api-osgi.jar
+#	deleted:    UVG_Web/web/WEB-INF/LIB/javaee-endorsed-api-6.0/webservices-api-osgi.jar
+#	deleted:    UVG_Web/web/WEB-INF/LIB/nblibraries.properties
+#	deleted:    UVG_Web/web/WEB-INF/glassfish-web.xml
+#	deleted:    UVG_Web/web/WEB-INF/web.xml
+#	deleted:    UVG_Web/web/app.gif
+#	deleted:    UVG_Web/web/cc.gif
+#	deleted:    UVG_Web/web/cg.gif
+#	deleted:    UVG_Web/web/collapse.gif
+#	deleted:    UVG_Web/web/css/UVGadded.css
+#	deleted:    UVG_Web/web/css/font/FontAwesome.otf
+#	deleted:    UVG_Web/web/css/font/fontawesome-webfont.eot
+#	deleted:    UVG_Web/web/css/font/fontawesome-webfont.svg
+#	deleted:    UVG_Web/web/css/font/fontawesome-webfont.ttf
+#	deleted:    UVG_Web/web/css/font/fontawesome-webfont.woff
+#	deleted:    UVG_Web/web/css/ie/PIE.htc
+#	deleted:    UVG_Web/web/css/ie/backgroundsize.min.htc
+#	deleted:    UVG_Web/web/css/ie/html5shiv.js
+#	deleted:    UVG_Web/web/css/ie/v8.css
+#	deleted:    UVG_Web/web/css/images/arrow.svg
+#	deleted:    UVG_Web/web/css/images/banner.svg
+#	deleted:    UVG_Web/web/css/images/loader.gif
+#	deleted:    UVG_Web/web/css/images/poptrox-closer.svg
+#	deleted:    UVG_Web/web/css/images/poptrox-nav.svg
+#	deleted:    UVG_Web/web/css/skel-noscript.css
+#	deleted:    UVG_Web/web/css/style-mobile.css
+#	deleted:    UVG_Web/web/css/style-narrow.css
+#	deleted:    UVG_Web/web/css/style-normal.css
+#	deleted:    UVG_Web/web/css/style-wide.css
+#	deleted:    UVG_Web/web/css/style.css
+#	deleted:    UVG_Web/web/css_master-all.css
+#	deleted:    UVG_Web/web/expand.gif
+#	deleted:    UVG_Web/web/images/background_border_bottom.gif
+#	deleted:    UVG_Web/web/images/bg-alt.jpg
+#	deleted:    UVG_Web/web/images/bg.jpg
+#	deleted:    UVG_Web/web/images/bg_gradient.gif
+#	deleted:    UVG_Web/web/images/fitzpatrick_skintypes.png
+#	deleted:    UVG_Web/web/images/fulls/01.jpg
+#	deleted:    UVG_Web/web/images/fulls/02.jpg
+#	deleted:    UVG_Web/web/images/fulls/03.jpg
+#	deleted:    UVG_Web/web/images/fulls/04.jpg
+#	deleted:    UVG_Web/web/images/fulls/05.jpg
+#	deleted:    UVG_Web/web/images/fulls/06.jpg
+#	deleted:    UVG_Web/web/images/fulls/07.jpg
+#	deleted:    UVG_Web/web/images/fulls/08.jpg
+#	deleted:    UVG_Web/web/images/level1_deselect.jpg
+#	deleted:    UVG_Web/web/images/level1_selected-1lvl.jpg
+#	deleted:    UVG_Web/web/images/masthead.png
+#	deleted:    UVG_Web/web/images/masthead_link_enabled.gif
+#	deleted:    UVG_Web/web/images/masthead_link_roll.gif
+#	deleted:    UVG_Web/web/images/pbdis.png
+#	deleted:    UVG_Web/web/images/pbena.png
+#	deleted:    UVG_Web/web/images/pbmou.png
+#	deleted:    UVG_Web/web/images/pbsel.png
+#	deleted:    UVG_Web/web/images/pic01.jpg
+#	deleted:    UVG_Web/web/images/pic02.jpg
+#	deleted:    UVG_Web/web/images/pname.png
+#	deleted:    UVG_Web/web/images/primary-enabled.gif
+#	deleted:    UVG_Web/web/images/primary-roll.gif
+#	deleted:    UVG_Web/web/images/secondary-enabled.gif
+#	deleted:    UVG_Web/web/images/tbsel.png
+#	deleted:    UVG_Web/web/images/tbuns.png
+#	deleted:    UVG_Web/web/images/thumbs/01.jpg
+#	deleted:    UVG_Web/web/images/thumbs/02.jpg
+#	deleted:    UVG_Web/web/images/thumbs/03.jpg
+#	deleted:    UVG_Web/web/images/thumbs/04.jpg
+#	deleted:    UVG_Web/web/images/thumbs/05.jpg
+#	deleted:    UVG_Web/web/images/thumbs/06.jpg
+#	deleted:    UVG_Web/web/images/thumbs/07.jpg
+#	deleted:    UVG_Web/web/images/thumbs/08.jpg
+#	deleted:    UVG_Web/web/index.jsp
+#	deleted:    UVG_Web/web/item.gif
+#	deleted:    UVG_Web/web/js/GoogleMapsConnect.js
+#	deleted:    UVG_Web/web/js/init.js
+#	deleted:    UVG_Web/web/js/jquery.min.js
+#	deleted:    UVG_Web/web/js/jquery.poptrox.min.js
+#	deleted:    UVG_Web/web/js/skel.min.js
+#	deleted:    UVG_Web/web/og.gif
+#	deleted:    UVG_Web/web/response.jsp
+#	deleted:    UVG_Web/web/test-resbeans.css
+#	deleted:    UVG_Web/web/test-resbeans.html
+#	deleted:    UVG_Web/web/test-resbeans.js
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	UVG_Web/
+
