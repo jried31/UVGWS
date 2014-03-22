@@ -8,6 +8,8 @@ import org.json.JSONObject;
 
 import navigation.server.API_Parser;
 import navigation.server.HttpSender;
+import navigation.util.SunUtil;
+import navigation.util.Util;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -33,6 +35,8 @@ public class Routes {
     private double uva;
     private double uvb;
     private double uvi;
+    private double uvi_sun;
+    private double uvi_shade;
     private String summary;
     private Step[] steps;
     private String polylines;
@@ -66,6 +70,14 @@ public class Routes {
         return sum;
     }
     
+    public double computeExposure(double percentExposed) {
+        double time_in_sun = this.getDurationInSun();
+        double time_in_shade = this.getDurationInShadow();
+        double exposure_sun = Util.computeExposure(this.uvi_sun, time_in_sun, percentExposed);
+        double exposure_shade = Util.computeExposure(this.uvi_shade, time_in_shade, percentExposed);
+        return exposure_sun + exposure_shade; // in Joules
+    }
+    
     /**
      * Sets all data and initializes the Route.
      */
@@ -76,6 +88,9 @@ public class Routes {
         setGoogleAPIJson(API_Parser.getRouteInformation(googleMapsResult, 0));
         setStart_time(startTime);
         setPace(pace);
+        SunUtil util = new SunUtil(startLocation);
+        this.uvi_sun = util.getUVISun();
+        this.uvi_shade = util.getUVIShade();
         initialize();
     }
 
