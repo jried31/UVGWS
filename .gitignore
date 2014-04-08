@@ -6,3 +6,5 @@
 
 # Package Files #
 *.ear
+/UVG_Navigation/build/
+/UVG_Navigation/dist/
